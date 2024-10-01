@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Upward Climb Game with HP Limit, Enhanced Power-Ups, Collapsing Platforms, and Coin System</title>
+<style>
+body {
+margin: 0;
+background-color: #87CEEB; /* Sky blue background */
+overflow: hidden;
+}
+#gameCanvas {
+display: block;
+margin: 0;
+background-color: #87CEEB;
+}
+
+/* Updated scoreBoard to include Coins */
+#scoreBoard {
+position: fixed;
+top: 10px;
+left: 10px;
+font-family: Arial, sans-serif;
+font-size: 20px;
+color: #fff;
+text-shadow: 1px 1px 2px #000;
+z-index: 1;
+}
+
+#powerUpDisplay {
+position: fixed;
+top: 50px;
+left: 10px;
+font-family: Arial, sans-serif;
+font-size: 18px;
+color: #fff;
+text-shadow: 1px 1px 2px #000;
+z-index: 1;
+white-space: pre-line; /* Preserve line breaks */
+}
+
+#startMenu, #infoMenu, #shopMenu, #gameOverScreen, #modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(135, 206, 235, 0.95); /* Semi-transparent sky blue */
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+font-family: Arial, sans-serif;
+color: #fff;
+z-index: 2;
+overflow-y: auto;
+padding: 20px;
+}
+
+#startMenu h1, #infoMenu h1, #shopMenu h1, #gameOverScreen h1, #modal h2 {
+font-size: 48px;
+margin-bottom: 20px;
+}
+
+#startMenu button, #infoMenu button, #shopMenu button, #gameOverScreen button, #modal button {
+padding: 10px 20px;
+font-size: 20px;
+background-color: #32CD32;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+color: #fff;
+margin: 10px;
+}
+
+#startMenu button:hover, #infoMenu button:hover, #shopMenu button:hover, #gameOverScreen button:hover, #modal button:hover {
+background-color: #228B22;
+}
+
+#infoMenu .power-up, #shopMenu .shop-item {
+display: flex;
+align-items: center;
+margin: 5px 0;
+}
+
+#infoMenu .power-up .icon, #shopMenu .shop-item .icon {
+width: 30px;
+height: 30px;
+border-radius: 50%;
+margin-right: 10px;
+position: relative;
+}
+
+#infoMenu .power-up .icon.glowing, #shopMenu .shop-item .icon.glowing::after {
+/* Glowing effect */
+}
+
+#infoMenu .power-up .icon.glowing::after, #shopMenu .shop-item .icon.glowing::after {
+content: '';
+position: absolute;
+top: -5px;
+left: -5px;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+border: 3px solid #FFFF00; /* Yellow glow */
+box-sizing: border-box;
+}
+
+#gameOverScreen p {
+font-size: 24px;
+margin-bottom: 10px;
+}
+
+/* Hide menus by default */
+#startMenu, #infoMenu, #shopMenu, #gameOverScreen, #modal {
+display: none;
+}
+
+/* Coin Display Styling */
+#startMenu .coin-display, #shopMenu .coin-display {
+margin-bottom: 20px;
+font-size: 24px;
+font-weight: bold;
+}
+
+/* Shop Item Styling */
+#shopMenu .shop-item {
+justify-content: space-between;
+width: 80%;
+max-width: 500px;
+padding: 10px;
+background-color: rgba(255, 255, 255, 0.2);
+border-radius: 10px;
+}
+
+#shopMenu .shop-item .description {
+flex-grow: 1;
+margin-left: 10px;
+}
+
+#shopMenu .shop-item button {
+background-color: #FFD700; /* Gold color for purchase buttons */
+}
+
+#shopMenu .shop-item button:hover {
+background-color: #FFA500; /* Darker gold/orange on hover */
+}
+
+/* Modal Styling */
+#modal {
+background-color: rgba(0, 0, 0, 0.8);
+flex-direction: column;
+align-items: center;
+justify-content: center;
+}
+
+#modalContent {
+background-color: #fff;
+color: #000;
+padding: 20px;
+border-radius: 10px;
+text-align: center;
+max-width: 80%;
+}
+
+#modalContent h2 {
+margin-top: 0;
+}
+
+#modalContent button {
+margin-top: 20px;
+background-color: #32CD32;
+color: #fff;
+border: none;
+padding: 10px 20px;
+cursor: pointer;
+border-radius: 5px;
+}
+
+#modalContent button:hover {
+background-color: #228B22;
+}
+
+/* Purchase Message Styling */
+#purchaseMessage {
+position: fixed;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+background-color: rgba(0, 0, 0, 0.7);
+color: #fff;
+padding: 10px 20px;
+border-radius: 5px;
+display: none;
+z-index: 3;
+font-family: Arial, sans-serif;
+font-size: 16px;
+}
+
+/* Locked Item Styling */
+#shopMenu .shop-item.locked {
+opacity: 0.5; /* Darken out locked items */
+cursor: not-allowed;
+}
+
+#shopMenu .shop-item.locked button {
+background-color: #808080; /* Gray out button */
+cursor: not-allowed;
+}
+</style>
+
+</head>
+<body>
+<!-- Updated scoreBoard to include Coins -->
+<div id="scoreBoard">Score: 0 | Coins: 0 | HP: 3/15</div>
+<div id="powerUpDisplay"></div>
+<canvas id="gameCanvas"></canvas>
+<!-- Start Menu -->
+<div id="startMenu">
+<h1>Upward Climb Game</h1>
+<!-- Coin Display Added -->
+<div class="coin-display">Coins: <span id="coinCount">0</span></div>
+<button onclick="startGame()">Start Game</button>
+<button onclick="showInfoMenu()">Info</button>
+<button onclick="showShopMenu()">Shop</button>
+</div>
+<!-- Info Menu -->
+<div id="infoMenu">
+<h1>Game Information</h1>
+<p><strong>Objective:</strong> Climb as high as possible while avoiding obstacles and collecting power-ups.</p>
+<p><strong>Controls:</strong></p>
+<p>Move Left: Arrow Left or 'A'</p>
+<p>Move Right: Arrow Right or 'D'</p>
+<p>Jump: Spacebar, Arrow Up, or 'W'</p>
+<p><strong>Power-Ups:</strong></p>
+<!-- Double Jump -->
+<div class="power-up">
+<div class="icon" style="background-color:#00BFFF;"></div>
+<p><span style="color:#00BFFF;">Double Jump</span>: Allows a second jump in mid-air.</p>
+</div>
+<!-- Glowing Double Jump -->
+<div class="power-up">
+<div class="icon glowing" style="background-color:#00BFFF;"></div>
+<p><span style="color:#00BFFF;">Glowing Double Jump</span>: Grants Time Stop effect.</p>
+</div>
+<!-- Invincibility -->
+<div class="power-up">
+<div class="icon" style="background-color:#FFD700;"></div>
+<p><span style="color:#FFD700;">Invincibility</span>: Makes you invincible for a limited time or until hit 3 times.</p>
+</div>
+<!-- Glowing Invincibility -->
+<div class="power-up">
+<div class="icon glowing" style="background-color:#FFD700;"></div>
+<p><span style="color:#FFD700;">Glowing Invincibility</span>: Grants True Invincibility for 15 seconds.</p>
+</div>
+<!-- HP Boost -->
+<div class="power-up">
+<div class="icon" style="background-color:#FF0000;"></div>
+<p><span style="color:#FF0000;">HP Boost</span>: Increases your HP by 1, up to a maximum of 15.</p>
+</div>
+<!-- Glowing HP Boost -->
+<div class="power-up">
+<div class="icon glowing" style="background-color:#FF0000;"></div>
+<p><span style="color:#FF0000;">Glowing HP Boost</span>: Increases your HP by 3 and your maximum HP by 5, up to a maximum of 50. Once at 50 max HP, it only increases your HP by 7.</p>
+</div>
+<!-- Flight -->
+<div class="power-up">
+<div class="icon" style="background-color:#FFFFFF; border: 1px solid #000;"></div>
+<p><span style="color:#FFFFFF;">Flight</span>: Grants upward movement and horizontal control.</p>
+</div>
+<!-- Glowing Flight -->
+<div class="power-up">
+<div class="icon glowing" style="background-color:#FFFFFF; border: 1px solid #000;"></div>
+<p><span style="color:#FFFFFF;">Glowing Flight</span>: Grants True Flight for 15 seconds.</p>
+</div>
+<!-- OWIE! -->
+<div class="power-up">
+<div class="icon" style="background-color:#FFA500;"></div>
+<p><span style="color:#FFA500;">OWIE!</span>: Propels you upward uncontrollably for a short time.</p>
+</div>
+<!-- True Flight -->
+<div class="power-up">
+<div class="icon" style="background-color:#7B68EE;"></div>
+<p><span style="color:#7B68EE;">True Flight</span>: Full control in all directions.</p>
+</div>
+<!-- True Invincibility -->
+<div class="power-up">
+<div class="icon" style="background-color:#00FF00;"></div>
+<p><span style="color:#00FF00;">True Invincibility</span>: Complete invincibility for a limited time.</p>
+</div>
+<!-- Time Stop -->
+<div class="power-up">
+<div class="icon" style="background-color:#808080;"></div>
+<p><span style="color:#808080;">Time Stop</span>: Freezes ground and obstacles; extends other abilities.</p>
+</div>
+<!-- Collapsing Platforms -->
+<div class="power-up">
+<div class="icon" style="background-color:#8B4513;"></div>
+<p><span style="color:#8B4513;">Collapsing Platforms</span>: Brown platforms that disappear 3 seconds after you land on them.</p>
+</div>
+<button onclick="showStartMenu()">Back</button>
+</div>
+<!-- Shop Menu -->
+<div id="shopMenu">
+<h1>Shop</h1>
+<!-- Coin Display Added -->
+<div class="coin-display">Coins: <span id="shopCoinCount">0</span></div>
+<!-- Shop Items (Sorted dynamically using JavaScript) -->
+<!-- New Shop Item: +2 Spawning HP -->
+<div class="shop-item" data-cost="25" id="spawningHPItem">
+<div class="icon" style="background-color:#FF69B4;"></div>
+<div class="description">
+<p><strong>+2 Spawning HP</strong></p>
+<p>Gives you +2 spawning HP.</p>
+</div>
+<button id="buySpawningHPBtn" onclick="purchaseSpawningHP()">Buy (25 Coins)</button>
+</div>
+<!-- Shop Item: Better Invincibility -->
+<div class="shop-item locked" id="betterInvincibilityItem" data-cost="50">
+<div class="icon" style="background-color:#FFFF00;"></div>
+<div class="description">
+<p><strong>Better Invincibility</strong></p>
+<p>Gives +5 seconds to invincibility and +1 to the hit counter. Stacks with "More Powerup Timer".</p>
+</div>
+<button id="buyBetterInvincibilityBtn" onclick="purchaseBetterInvincibility()">Buy (50 Coins)</button>
+</div>
+<!-- Shop Item: Coin Collectible -->
+<div class="shop-item" data-cost="30" id="coinCollectibleItem">
+<div class="icon" style="background-color: #b9b9f3; width: 20px; height: 20px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+transform: translateX(5px);">
+</div>
+<div class="description">
+<p><strong>Coin Collectible</strong></p>
+<p>Gives a chance for coin collectibles to spawn.</p>
+</div>
+<button id="buyCoinCollectibleBtn" onclick="purchaseCoinCollectible()">Buy (30 Coins)</button>
+</div>
+<!-- Shop Item: 2x Coin Collectible Spawn -->
+<div class="shop-item locked" id="doubleCoinSpawnItem" data-cost="75">
+<div class="icon" style="background-color: #b9b9f3; width: 20px; height: 20px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+transform: translateX(5px);">
+</div>
+<div class="description">
+<p><strong>2x Coin Collectible Spawn</strong></p>
+<p>Doubles the spawn rate of coin collectibles.</p>
+</div>
+<button id="buyDoubleCoinSpawnBtn" onclick="purchaseDoubleCoinSpawn()">Buy (75 Coins)</button>
+</div>
+<!-- Shop Item: More Powerup Timer -->
+<div class="shop-item locked" data-cost="125" id="powerupTimerItem">
+<div class="icon" style="background-color:#1E90FF;">
+</div>
+<div class="description">
+<p><strong>More Powerup Timer</strong></p>
+<p>Gives +5 seconds to all powerups except owie.</p>
+</div>
+<button id="buyPowerupTimerBtn" onclick="purchasePowerupTimer()">Buy (125 Coins)</button>
+</div>
+<!-- Shop Item: Glowing Coin Chance -->
+<div class="shop-item locked" id="glowingCoinChanceItem" data-cost="250">
+<div class="icon glowing" style="background-color: #b9b9f3; width: 20px; height: 20px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+transform: translateX(5px);">
+</div>
+<div class="description">
+<p><strong>Glowing Coin Chance</strong></p>
+<p>All Coin Collectibles have a 30% chance of glowing and giving 50 coins instead.</p>
+</div>
+<button id="buyGlowingCoinChanceBtn" onclick="purchaseGlowingCoinChance()">Buy (250 Coins)</button>
+</div>
+<button onclick="showStartMenu()">Back</button>
+</div>
+<!-- Game Over Screen -->
+<div id="gameOverScreen">
+<h1>Game Over</h1>
+<p>Your Score: <span id="finalScore">0</span></p>
+<p>High Score: <span id="highScore">0</span></p>
+<!-- Removed "Coins Earned:" text -->
+<button onclick="restartGame()">Play Again</button>
+<button onclick="showStartMenu()">Return to Main Menu</button>
+</div>
+<!-- Custom Modal -->
+<div id="modal">
+<div id="modalContent">
+<h2 id="modalTitle">Title</h2>
+<p id="modalMessage">Message</p>
+<button onclick="closeModal()">OK</button>
+</div>
+</div>
+<!-- Purchase Message -->
+<div id="purchaseMessage"></div> <!-- Added for purchase notifications -->
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreBoard = document.getElementById('scoreBoard');
+const gameOverScreen = document.getElementById('gameOverScreen');
+const finalScoreDisplay = document.getElementById('finalScore');
+const highScoreDisplay = document.getElementById('highScore');
+const powerUpDisplay = document.getElementById('powerUpDisplay');
+const startMenu = document.getElementById('startMenu');
+const infoMenu = document.getElementById('infoMenu');
+const shopMenu = document.getElementById('shopMenu');
+const shopCoinCount = document.getElementById('shopCoinCount');
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMessage = document.getElementById('modalMessage');
+const purchaseMessage = document.getElementById('purchaseMessage');
+// Set canvas to full screen
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let GAME_WIDTH = canvas.width;
+let GAME_HEIGHT = canvas.height;
+
+let keys = {};
+let platforms = [];
+let obstacles = [];
+let flightObstacles = [];
+let powerUps = [];
+let coinCollectibles = [];
+let score = 0; // Total accumulated score
+let scoreThisRun = 0; // Score for the current run
+let totalScore = 0;
+let gameOver = false; // Game over flag
+let startTime;
+let groundSafeTime = 5000;
+let groundIsDeadly = false;
+let groundY;
+let groundSpeed = 0;
+let activePowerUps = {};
+let player;
+let cameraOffsetY = 0;
+let cameraTargetY = 0;
+let lastPlatformY;
+let floorHitCost = 5;
+let highScore = parseInt(localStorage.getItem('highScore')) || 0;
+let coins = parseInt(localStorage.getItem('coins')) || 0;
+let timeStopActive = false;
+let scoreBaseY;
+let lastUpdateTime = Date.now();
+let nextCoinScore = 1000; // Threshold for awarding next coin
+
+let coinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true';
+let glowingCoinChancePurchased = localStorage.getItem('glowingCoinChancePurchased') === 'true';
+let doubleCoinSpawnPurchased = localStorage.getItem('doubleCoinSpawnPurchased') === 'true';
+let coinSpawnMultiplier = doubleCoinSpawnPurchased ? 2 : 1;
+let betterInvincibilityPurchased = localStorage.getItem('betterInvincibilityPurchased') === 'true';
+
+let powerupTimerBonus = parseInt(localStorage.getItem('powerupTimerBonus')) || 0;
+let invincibilityHitBonus = betterInvincibilityPurchased ? 1 : 0;
+
+let spawningHPBonus = parseInt(localStorage.getItem('spawningHPBonus')) || 0;
+
+document.addEventListener('keydown', function(e) {
+keys[e.code] = true;
+
+if (e.code === 'Numpad5') {
+showConfirmationModal('Reset Game Data', 'Are you sure you want to reset all game data? This will erase your high score and coins.', () => {
+localStorage.clear();
+highScore = 0;
+coins = 0;
+powerupTimerBonus = 0;
+spawningHPBonus = 0;
+coinCollectiblePurchased = false;
+glowingCoinChancePurchased = false;
+doubleCoinSpawnPurchased = false;
+coinSpawnMultiplier = 1;
+betterInvincibilityPurchased = false;
+invincibilityHitBonus = 0;
+updateCoinDisplay();
+updateShopCoinDisplay();
+updateShopButtonState();
+showPurchaseMessage('Game Data Reset');
+});
+}
+});
+
+document.addEventListener('keyup', function(e) {
+keys[e.code] = false;
+});
+
+class Player {
+constructor(spawningHPBonus = 0) {
+this.width = 40;
+this.height = 50;
+this.x = (GAME_WIDTH - this.width) / 2;
+this.y = groundY - this.height;
+this.vx = 0;
+this.vy = 0;
+this.speed = 6;
+this.jumpStrength = 15;
+this.gravity = 0.5;
+this.onGround = false;
+this.canDoubleJump = false;
+this.hasDoubleJumped = false;
+this.isInvincible = false;
+this.invincibilityHitsRemaining = 0;
+this.hp = 3 + spawningHPBonus;
+this.maxHP = 15;
+this.canFly = false;
+this.isOwie = false;
+this.canTrueFly = false;
+this.isTrueInvincible = false;
+this.isPhasing = false;
+}
+
+update() {
+if (!this.canTrueFly) {
+this.vy += this.gravity;
+}
+
+this.vx = 0;
+
+if (this.isOwie) {
+this.vy = -5;
+} else if (this.canTrueFly) {
+if (keys['ArrowLeft'] || keys['KeyA']) {
+this.vx = -this.speed;
+} else if (keys['ArrowRight'] || keys['KeyD']) {
+this.vx = this.speed;
+}
+
+if (keys['ArrowUp'] || keys['KeyW']) {
+this.vy = -this.speed;
+} else if (keys['ArrowDown'] || keys['KeyS']) {
+this.vy = this.speed;
+} else {
+this.vy = 0;
+}
+} else if (this.canFly) {
+if (keys['ArrowLeft'] || keys['KeyA']) {
+this.vx = -this.speed;
+} else if (keys['ArrowRight'] || keys['KeyD']) {
+this.vx = this.speed;
+}
+this.vy = -this.speed / 2;
+} else {
+if (keys['ArrowLeft'] || keys['KeyA']) {
+this.vx = -this.speed;
+} else if (keys['ArrowRight'] || keys['KeyD']) {
+this.vx = this.speed;
+}
+
+if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW']) && !this.isPhasing) {
+if (this.onGround) {
+this.vy = -this.jumpStrength;
+this.onGround = false;
+this.hasDoubleJumped = false;
+} else if (this.canDoubleJump && !this.hasDoubleJumped) {
+this.vy = -this.jumpStrength;
+this.hasDoubleJumped = true;
+}
+}
+
+if (keys['ArrowDown'] || keys['KeyS']) {
+this.isPhasing = true;
+} else {
+this.isPhasing = false;
+}
+}
+
+this.x += this.vx;
+this.y += this.vy;
+
+if (this.x + this.width < 0) {
+this.x = GAME_WIDTH;
+} else if (this.x > GAME_WIDTH) {
+this.x = -this.width;
+}
+
+this.onGround = false;
+if (!this.canFly && !this.canTrueFly && !this.isOwie) {
+for (let platform of platforms) {
+if (this.isPhasing) {
+continue;
+}
+
+if (
+this.x + this.width > platform.x &&
+this.x < platform.x + platform.width &&
+this.y + this.height > platform.y &&
+this.y + this.vy <= platform.y &&
+this.vy >= 0
+) {
+this.vy = 0;
+this.y = platform.y - this.height;
+this.onGround = true;
+this.hasDoubleJumped = false;
+
+cameraTargetY = this.y - GAME_HEIGHT / 2;
+
+if (platform.isCollapsing && !platform.hasCollapsingTriggered && !timeStopActive) {
+platform.startCollapse();
+}
+
+break;
+}
+}
+
+if (this.y + this.height > groundY) {
+this.y = groundY - this.height;
+this.onGround = true;
+
+if (groundIsDeadly) {
+if (this.isTrueInvincible) {
+} else {
+if (this.isInvincible) {
+this.isInvincible = false;
+delete activePowerUps['invincibility'];
+}
+
+if (this.hp > floorHitCost) {
+this.hp -= floorHitCost;
+floorHitCost = Math.min(floorHitCost + 5, 15);
+
+this.activatePowerUp('trueInvincibility', 9000);
+this.activatePowerUp('owie', 3000);
+setTimeout(() => {
+this.activatePowerUp('trueFlight', 4000);
+}, 3000);
+
+scoreBaseY = groundY;
+totalScore += scoreThisRun;
+scoreThisRun = 0;
+} else {
+gameOver = true;
+finalScoreDisplay.innerText = score;
+updateCoins(0);
+if (score > highScore) {
+highScore = score;
+localStorage.setItem('highScore', highScore);
+}
+highScoreDisplay.innerText = highScore;
+gameOverScreen.style.display = 'flex';
+}
+}
+}
+cameraTargetY = this.y - GAME_HEIGHT / 2;
+}
+}
+
+if (this.y - cameraOffsetY > GAME_HEIGHT - 100) {
+cameraTargetY = this.y - (GAME_HEIGHT - 100);
+}
+
+if (this.canFly || this.canTrueFly || this.isOwie) {
+cameraTargetY = this.y - GAME_HEIGHT / 2;
+}
+
+for (let obstacle of obstacles) {
+if (this.x + this.width > obstacle.x &&
+this.x < obstacle.x + obstacle.width &&
+this.y + this.height > obstacle.y &&
+this.y < obstacle.y + obstacle.height) {
+if (this.isTrueInvincible) {
+} else if (this.isInvincible) {
+this.invincibilityHitsRemaining -= 1;
+obstacles.splice(obstacles.indexOf(obstacle), 1);
+if (this.invincibilityHitsRemaining <= 0) {
+this.isInvincible = false;
+delete activePowerUps['invincibility'];
+}
+} else {
+obstacles.splice(obstacles.indexOf(obstacle), 1);
+this.hp -= 1;
+if (this.hp <= 0) {
+gameOver = true;
+finalScoreDisplay.innerText = score;
+updateCoins(0);
+if (score > highScore) {
+highScore = score;
+localStorage.setItem('highScore', highScore);
+}
+highScoreDisplay.innerText = highScore;
+gameOverScreen.style.display = 'flex';
+}
+}
+}
+}
+
+for (let obstacle of flightObstacles) {
+if (this.x + this.width > obstacle.x &&
+this.x < obstacle.x + obstacle.width &&
+this.y + this.height > obstacle.y &&
+this.y < obstacle.y + obstacle.height) {
+if (this.isTrueInvincible) {
+} else {
+if (this.isInvincible) {
+this.invincibilityHitsRemaining -= 1;
+if (this.invincibilityHitsRemaining <= 0) {
+this.isInvincible = false;
+delete activePowerUps['invincibility'];
+}
+}
+this.hp -= 1;
+if (this.hp <= 0) {
+gameOver = true;
+finalScoreDisplay.innerText = score;
+updateCoins(0);
+if (score > highScore) {
+highScore = score;
+localStorage.setItem('highScore', highScore);
+}
+highScoreDisplay.innerText = highScore;
+gameOverScreen.style.display = 'flex';
+}
+}
+}
+}
+
+for (let i = powerUps.length - 1; i >= 0; i--) {
+let powerUp = powerUps[i];
+if (this.x + this.width > powerUp.x &&
+this.x < powerUp.x + powerUp.size &&
+this.y + this.height > powerUp.y &&
+this.y < powerUp.y + powerUp.size) {
+
+if (powerUp.isGlowing) {
+this.collectGlowingPowerUp(powerUp.type);
+} else {
+this.activatePowerUp(powerUp.type);
+}
+
+powerUps.splice(i, 1);
+}
+}
+
+if (coinCollectiblePurchased) {
+for (let i = coinCollectibles.length - 1; i >= 0; i--) {
+let coinCollectible = coinCollectibles[i];
+if (
+this.x + this.width > coinCollectible.x &&
+this.x < coinCollectible.x + coinCollectible.size &&
+this.y + this.height > coinCollectible.y &&
+this.y < coinCollectible.y + coinCollectible.size
+) {
+if (coinCollectible.isGlowing) {
+updateCoins(50);
+} else {
+updateCoins(10);
+}
+
+coinCollectibles.splice(i, 1);
+}
+}
+}
+
+if (this.y > groundY + 200) {
+gameOver = true;
+finalScoreDisplay.innerText = score;
+updateCoins(0);
+if (score > highScore) {
+highScore = score;
+localStorage.setItem('highScore', highScore);
+}
+highScoreDisplay.innerText = highScore;
+gameOverScreen.style.display = 'flex';
+}
+
+let currentScore = Math.floor(-(this.y - scoreBaseY));
+if (currentScore > scoreThisRun) {
+scoreThisRun = currentScore;
+}
+score = totalScore + scoreThisRun;
+
+scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${this.hp}/${this.maxHP}`;
+
+// Coin awarding logic
+if (score >= nextCoinScore) {
+updateCoins(1); // Award 1 coin
+nextCoinScore += 1000; // Increase threshold for next coin
+}
+}
+
+activatePowerUp(type, duration = null) {
+const defaultDurations = {
+doubleJump: 10000,
+invincibility: 16000,
+flight: 10000,
+owie: 3000,
+trueFlight: 4000,
+trueInvincibility: 9000,
+timeStop: 30000,
+};
+
+if (type === 'hpBoost') {
+this.hp = Math.min(this.hp + 1, this.maxHP);
+return;
+}
+
+if (type === 'glowingHpBoost') {
+if (this.maxHP < 50) {
+let hpIncrease = 3;
+let maxHPIncrease = 5;
+let newMaxHP = Math.min(this.maxHP + maxHPIncrease, 50);
+let actualMaxHPIncrease = newMaxHP - this.maxHP;
+this.maxHP = newMaxHP;
+this.hp = Math.min(this.hp + hpIncrease, this.maxHP);
+} else {
+this.hp = Math.min(this.hp + 7, this.maxHP);
+}
+
+scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${this.hp}/${this.maxHP}`;
+return;
+}
+
+let powerUpDuration = duration || defaultDurations[type];
+
+if (powerUpDuration === undefined) {
+console.warn(`No duration specified for power-up type: ${type}`);
+return;
+}
+
+if (type !== 'owie') {
+powerUpDuration += powerupTimerBonus * 5000;
+}
+
+if (type === 'invincibility' && betterInvincibilityPurchased) {
+powerUpDuration += 5000;
+this.invincibilityHitsRemaining += 1;
+}
+
+if (type === 'doubleJump') {
+this.canDoubleJump = true;
+} else if (type === 'invincibility') {
+this.isInvincible = true;
+this.invincibilityHitsRemaining = 3 + invincibilityHitBonus;
+} else if (type === 'flight') {
+this.canFly = true;
+} else if (type === 'owie') {
+this.isOwie = true;
+this.vy = -5;
+} else if (type === 'trueFlight') {
+this.canTrueFly = true;
+} else if (type === 'trueInvincibility') {
+this.isTrueInvincible = true;
+} else if (type === 'timeStop') {
+timeStopActive = true;
+}
+
+activePowerUps[type] = {
+remainingTime: powerUpDuration,
+};
+} // <-- Missing brace was here!
+
+collectGlowingPowerUp(type) {
+if (type === 'doubleJump') {
+this.activatePowerUp('timeStop', 30000);
+} else if (type === 'invincibility') {
+this.activatePowerUp('trueInvincibility', 15000);
+} else if (type === 'flight') {
+this.activatePowerUp('trueFlight', 15000);
+} else if (type === 'hpBoost') {
+this.activatePowerUp('glowingHpBoost');
+}
+}
+
+updatePowerUps() {
+let currentTime = Date.now();
+let deltaTime = currentTime - lastUpdateTime;
+lastUpdateTime = currentTime;
+
+let timeMultiplier = timeStopActive ? 0.5 : 1;
+
+for (let [type, powerUpData] of Object.entries(activePowerUps)) {
+let actualTimeMultiplier = (timeStopActive && type !== 'timeStop') ? timeMultiplier : 1;
+
+if (type === 'timeStop') {
+powerUpData.remainingTime -= deltaTime;
+} else {
+powerUpData.remainingTime -= deltaTime * actualTimeMultiplier;
+}
+
+if (powerUpData.remainingTime <= 0) {
+if (type === 'doubleJump') {
+this.canDoubleJump = false;
+} else if (type === 'invincibility') {
+this.isInvincible = false;
+} else if (type === 'flight') {
+this.canFly = false;
+flightObstacles = [];
+} else if (type === 'owie') {
+this.isOwie = false;
+} else if (type === 'trueFlight') {
+this.canTrueFly = false;
+} else if (type === 'trueInvincibility') {
+this.isTrueInvincible = false;
+} else if (type === 'timeStop') {
+timeStopActive = false;
+}
+delete activePowerUps[type];
+}
+}
+}
+
+draw() {
+ctx.fillStyle = this.isTrueInvincible ? '#00FF00' : this.isInvincible ? '#FFD700' : '#FF4500';
+if (this.canFly || this.canTrueFly) {
+ctx.fillStyle = '#FFFFFF';
+}
+if (this.isOwie) {
+ctx.fillStyle = '#FFA500';
+}
+ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
+
+if (this.isInvincible && !this.isTrueInvincible) {
+ctx.fillStyle = '#000000';
+ctx.font = '20px Arial';
+ctx.fillText(this.invincibilityHitsRemaining, this.x + this.width / 2 - 5, this.y - cameraOffsetY + this.height / 2 + 7);
+}
+if (this.isTrueInvincible) {
+ctx.fillStyle = '#000000';
+ctx.font = '20px Arial';
+ctx.fillText('∞', this.x + this.width / 2 - 5, this.y - cameraOffsetY + this.height / 2 + 7);
+}
+}
+}
+
+class Platform {
+constructor(x, y, width, height, isMoving = false, isCollapsing = false) {
+this.x = x;
+this.y = y;
+this.width = width;
+this.height = height;
+this.isMoving = isMoving;
+this.isCollapsing = isCollapsing;
+this.hasCollapsingTriggered = false;
+this.collapseTimer = 0;
+this.vx = isMoving ? (Math.random() < 0.5 ? -2 : 2) : 0;
+}
+
+update() {
+if (this.isMoving && !timeStopActive) {
+this.x += this.vx;
+if (this.x < 0 || this.x + this.width > GAME_WIDTH) {
+this.vx *= -1;
+}
+}
+
+if (this.isCollapsing && this.hasCollapsingTriggered && !timeStopActive) {
+this.collapseTimer -= 16;
+if (this.collapseTimer <= 0) {
+platforms.splice(platforms.indexOf(this), 1);
+}
+}
+}
+
+startCollapse() {
+this.hasCollapsingTriggered = true;
+this.collapseTimer = 3000;
+}
+
+shouldRemove() {
+return this.y > groundY;
+}
+
+draw() {
+if (this.isCollapsing) {
+ctx.fillStyle = '#8B4513';
+} else {
+ctx.fillStyle = this.isMoving ? '#32CD32' : '#228B22';
+}
+ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
+
+if (this.isCollapsing && this.hasCollapsingTriggered) {
+ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
+}
+}
+}
+
+class Obstacle {
+constructor(x, y, width, height, color = '#8B0000', vx = 0, vy = 0) {
+this.x = x;
+this.y = y;
+this.width = width;
+this.height = height;
+this.color = color;
+this.vx = vx;
+this.vy = vy;
+}
+
+update() {
+if (!timeStopActive) {
+this.x += this.vx;
+this.y += this.vy;
+
+if (this.x < 0 || this.x + this.width > GAME_WIDTH) {
+this.vx *= -1;
+}
+if (this.y < 0 || this.y + this.height > groundY) {
+this.vy *= -1;
+}
+}
+}
+
+shouldRemove() {
+return this.y > groundY;
+}
+
+draw() {
+ctx.fillStyle = this.color;
+ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
+}
+}
+
+class PowerUp {
+constructor(x, y, type, isGlowing = false) {
+this.x = x;
+this.y = y;
+this.size = 25;
+this.type = type;
+this.isGlowing = isGlowing;
+
+if (type === 'doubleJump') {
+this.color = '#00BFFF';
+} else if (type === 'invincibility') {
+this.color = '#FFD700';
+} else if (type === 'hpBoost') {
+this.color = '#FF0000';
+} else if (type === 'flight') {
+this.color = '#FFFFFF';
+} else if (type === 'owie') {
+this.color = '#FFA500';
+} else if (type === 'trueFlight') {
+this.color = '#7B68EE';
+} else if (type === 'trueInvincibility') {
+this.color = '#00FF00';
+} else if (type === 'timeStop') {
+this.color = '#808080';
+}
+}
+
+draw() {
+ctx.fillStyle = this.color;
+ctx.beginPath();
+ctx.arc(this.x + this.size / 2, this.y - cameraOffsetY + this.size / 2, this.size / 2, 0, Math.PI * 2);
+ctx.fill();
+
+if (this.isGlowing) {
+ctx.strokeStyle = '#FFFF00';
+ctx.lineWidth = 5;
+ctx.beginPath();
+ctx.arc(this.x + this.size / 2, this.y - cameraOffsetY + this.size / 2, this.size / 2 + 5, 0, Math.PI * 2);
+ctx.stroke();
+}
+}
+}
+
+class CoinCollectible {
+constructor(x, y, isGlowing = false) {
+this.x = x;
+this.y = y;
+this.size = 20;
+this.color = isGlowing ? '#FFFF00' : '#FFD700';
+this.isGlowing = isGlowing;
+}
+
+draw() {
+ctx.fillStyle = this.color;
+ctx.beginPath();
+ctx.moveTo(this.x + this.size / 2, this.y - cameraOffsetY);
+ctx.lineTo(this.x + this.size, this.y - cameraOffsetY + this.size / 2);
+ctx.lineTo(this.x + this.size / 2, this.y - cameraOffsetY + this.size);
+ctx.lineTo(this.x, this.y - cameraOffsetY + this.size / 2);
+ctx.closePath();
+ctx.fill();
+
+if (this.isGlowing) {
+ctx.strokeStyle = '#FFFFFF';
+ctx.lineWidth = 3;
+ctx.beginPath();
+ctx.moveTo(this.x + this.size / 2, this.y - cameraOffsetY - 5);
+ctx.lineTo(this.x + this.size + 5, this.y - cameraOffsetY + this.size / 2);
+ctx.lineTo(this.x + this.size / 2, this.y - cameraOffsetY + this.size + 5);
+ctx.lineTo(this.x - 5, this.y - cameraOffsetY + this.size / 2);
+ctx.closePath();
+ctx.stroke();
+}
+}
+}
+
+function generateInitialPlatforms() {
+platforms = [];
+for (let i = 0; i < 10; i++) {
+addPlatformsRow();
+}
+}
+
+function addPlatformsRow() {
+let rowY = lastPlatformY - 120;
+lastPlatformY = rowY;
+let platformsInRow = 3;
+let platformWidth = 100;
+let platformHeight = 15;
+
+for (let i = 0; i < platformsInRow; i++) {
+let x = (i + Math.random() * 0.5) * (GAME_WIDTH / platformsInRow);
+let isMoving = shouldPlatformMove();
+let isCollapsing = Math.random() < 0.1;
+
+platforms.push(new Platform(x, rowY, platformWidth, platformHeight, isMoving, isCollapsing));
+
+if (Math.random() < 0.2) {
+let powerUpType;
+let rand = Math.random();
+let isGlowing = false;
+
+if (rand < 0.2) {
+powerUpType = 'doubleJump';
+isGlowing = Math.random() < 0.1;
+} else if (rand < 0.4) {
+powerUpType = 'invincibility';
+isGlowing = Math.random() < 0.05;
+} else if (rand < 0.8) {
+powerUpType = 'hpBoost';
+isGlowing = Math.random() < 0.05;
+} else if (rand < 0.805) {
+powerUpType = 'flight';
+isGlowing = Math.random() < 0.25;
+} else {
+powerUpType = 'hpBoost';
+isGlowing = Math.random() < 0.05;
+}
+
+powerUps.push(new PowerUp(x + platformWidth / 2 - 12.5, rowY - 30, powerUpType, isGlowing));
+}
+
+if (coinCollectiblePurchased && Math.random() < 0.015 * coinSpawnMultiplier && !powerUpOnPlatform(x, rowY)) {
+let safeDistance = 50;
+let collectibleX = x + safeDistance + (Math.random() * (platformWidth - 2 * safeDistance));
+let collectibleY = rowY - 45;
+let isGlowing = glowingCoinChancePurchased && Math.random() < 0.3;
+coinCollectibles.push(new CoinCollectible(collectibleX, collectibleY, isGlowing));
+}
+}
+}
+
+function shouldPlatformMove() {
+let baseChance = 0.25;
+let scoreThresholds = [1000, 3000, 6000, 10000];
+let reductionFactors = [0.75, 0.65, 0.6, 0.55, 0.5, 0.4];
+let index = 0;
+
+while (index < scoreThresholds.length && score > scoreThresholds[index]) {
+index++;
+}
+
+let reduction = reductionFactors[index] || reductionFactors[reductionFactors.length - 1];
+return Math.random() < baseChance * (1 - reduction);
+}
+
+function generateObstaclesRow(yPosition) {
+let obstacleCount = 1;
+
+for (let i = 0; i < obstacleCount; i++) {
+let width = 40;
+let height = 40;
+let x = Math.random() * (GAME_WIDTH - width);
+let y = yPosition;
+
+let isMoving = Math.random() < 0.5;
+let vx = isMoving ? (Math.random() - 0.5) * 4 : 0;
+let vy = 0;
+
+obstacles.push(new Obstacle(x, y, width, height, '#8B0000', vx, vy));
+}
+}
+
+function spawnFlightObstacles() {
+flightObstacles = [];
+let spawnRate = 500 / 8;
+let flightEndTime = Date.now() + activePowerUps['flight'].remainingTime;
+
+function spawnObstacle() {
+
+}
+
+let obstacleSpawner = setInterval(() => {
+if (Date.now() > flightEndTime) {
+clearInterval(obstacleSpawner);
+flightObstacles = [];
+} else {
+spawnObstacle();
+}
+}, spawnRate);
+}
+
+function updatePowerUpDisplay() {
+let texts = [];
+for (let [type, powerUpData] of Object.entries(activePowerUps)) {
+let remaining = Math.ceil(powerUpData.remainingTime / 1000);
+let name = '';
+if (type === 'doubleJump') name = 'Double Jump';
+else if (type === 'invincibility') name = 'Invincibility';
+else if (type === 'flight') name = 'Flight';
+else if (type === 'owie') name = 'OWIE!';
+else if (type === 'trueFlight') name = 'True Flight';
+else if (type === 'trueInvincibility') name = 'True Invincibility';
+else if (type === 'timeStop') name = 'Time Stop';
+texts.push(`${name}: ${remaining}s`);
+}
+powerUpDisplay.innerText = texts.join('\n');
+}
+
+function applyTimeStopEffect() {
+if (timeStopActive) {
+ctx.save();
+ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+ctx.globalCompositeOperation = 'saturation';
+ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+ctx.restore();
+}
+}
+
+function updateCoins(earnedCoins) {
+if (earnedCoins > 0) {
+coins += earnedCoins;
+localStorage.setItem('coins', coins);
+updateCoinDisplay();
+updateShopCoinDisplay();
+}
+}
+
+function updateCoinDisplay() {
+const coinCount = document.getElementById('coinCount');
+if (coinCount) {
+coinCount.innerText = coins;
+}
+if (player) {
+scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${player.hp}/${player.maxHP}`;
+}
+}
+
+function updateShopCoinDisplay() {
+const shopCoinDisplay = document.getElementById('shopCoinCount');
+if (shopCoinDisplay) {
+shopCoinDisplay.innerText = coins;
+}
+}
+
+function startGame() {
+startMenu.style.display = 'none';
+shopMenu.style.display = 'none';
+infoMenu.style.display = 'none';
+initializeGame();
+gameLoop();
+}
+
+function showInfoMenu() {
+startMenu.style.display = 'none';
+shopMenu.style.display = 'none';
+infoMenu.style.display = 'flex';
+}
+
+function showShopMenu() {
+startMenu.style.display = 'none';
+infoMenu.style.display = 'none';
+shopMenu.style.display = 'flex';
+updateShopCoinDisplay();
+updateShopButtonState();
+sortShopItems();
+}
+
+function sortShopItems() {
+const shopItems = Array.from(document.querySelectorAll('#shopMenu .shop-item'));
+
+shopItems.sort((a, b) => {
+const costA = parseInt(a.getAttribute('data-cost'));
+const costB = parseInt(b.getAttribute('data-cost'));
+return costA - costB;
+});
+
+const shopMenuDiv = document.getElementById('shopMenu');
+shopItems.forEach(item => shopMenuDiv.appendChild(item));
+}
+
+function showStartMenu() {
+infoMenu.style.display = 'none';
+shopMenu.style.display = 'none';
+gameOverScreen.style.display = 'none';
+modal.style.display = 'none';
+startMenu.style.display = 'flex';
+updateCoinDisplay();
+}
+
+function powerUpOnPlatform(platformX, platformY) {
+for (let powerUp of powerUps) {
+if (
+powerUp.x > platformX &&
+powerUp.x + powerUp.size < platformX + 100 &&
+powerUp.y === platformY - 30
+) {
+return true;
+}
+}
+return false;
+}
+
+function initializeGame() {
+score = 0;
+scoreThisRun = 0;
+totalScore = 0;
+gameOver = false;
+startTime = Date.now();
+groundIsDeadly = false;
+groundSpeed = 0;
+groundY = GAME_HEIGHT - 20;
+scoreBaseY = groundY;
+activePowerUps = {};
+floorHitCost = 5;
+timeStopActive = false;
+lastUpdateTime = Date.now();
+player = new Player(spawningHPBonus);
+generateInitialPlatforms();
+obstacles = [];
+powerUps = [];
+coinCollectibles = [];
+flightObstacles = [];
+cameraOffsetY = player.y - GAME_HEIGHT / 2;
+cameraTargetY = cameraOffsetY;
+lastPlatformY = groundY - 100;
+nextCoinScore = 1000; // Reset coin threshold
+powerupTimerBonus = parseInt(localStorage.getItem('powerupTimerBonus')) || 0;
+spawningHPBonus = parseInt(localStorage.getItem('spawningHPBonus')) || 0;
+coinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true';
+glowingCoinChancePurchased = localStorage.getItem('glowingCoinChancePurchased') === 'true';
+doubleCoinSpawnPurchased = localStorage.getItem('doubleCoinSpawnPurchased') === 'true';
+coinSpawnMultiplier = doubleCoinSpawnPurchased ? 2 : 1;
+betterInvincibilityPurchased = localStorage.getItem('betterInvincibilityPurchased') === 'true';
+invincibilityHitBonus = betterInvincibilityPurchased ? 1 : 0;
+updateShopButtonState();
+showItemsBasedOnPurchases();
+}
+
+function restartGame() {
+gameOverScreen.style.display = 'none';
+initializeGame();
+gameLoop();
+}
+
+function purchasePowerupTimer() {
+const cost = 125;
+const powerupTimerItem = document.getElementById('powerupTimerItem');
+if (powerupTimerItem.classList.contains('locked')) {
+showPurchaseMessage('Item is locked', false);
+return; // Exit the function if the item is locked
+}
+
+if (coins >= cost) {
+coins -= cost;
+localStorage.setItem('coins', coins);
+updateCoinDisplay();
+updateShopCoinDisplay();
+
+localStorage.setItem('morePowerupTimerPurchased', 'true');
+powerupTimerBonus += 1;
+localStorage.setItem('powerupTimerBonus', powerupTimerBonus);
+
+for (let [type, powerUpData] of Object.entries(activePowerUps)) {
+if (type !== 'owie') {
+powerUpData.remainingTime += 5000;
+}
+}
+
+const buyButton = document.getElementById('buyPowerupTimerBtn');
+if (buyButton) {
+buyButton.innerText = 'Purchased';
+buyButton.disabled = true;
+buyButton.style.backgroundColor = '#808080';
+buyButton.style.cursor = 'not-allowed';
+}
+
+showPurchaseMessage('Bought Extra Timer');
+} else {
+showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
+}
+}
+
+function purchaseSpawningHP() {
+const cost = 25;
+const spawningHPItem = document.getElementById('spawningHPItem'); 
+if (spawningHPItem.classList.contains('locked')) {
+showPurchaseMessage('Item is locked', false);
+return; // Exit the function if the item is locked
+}
+
+if (coins >= cost) {
+coins -= cost;
+localStorage.setItem('coins', coins);
+updateCoinDisplay();
+updateShopCoinDisplay();
+localStorage.setItem('spawningHPPurchased', 'true');
+
+spawningHPBonus += 2;
+localStorage.setItem('spawningHPBonus', spawningHPBonus);
+
+const buyButton = document.getElementById('buySpawningHPBtn');
+if (buyButton) {
+buyButton.innerText = 'Purchased';
+buyButton.disabled = true;
+buyButton.style.backgroundColor = '#808080';
+buyButton.style.cursor = 'not-allowed';
+}
+
+showPurchaseMessage('Bought +2 Spawning HP');
+
+showItemsBasedOnPurchases();
+} else {
+showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
+}
+}
+
+function purchaseCoinCollectible() {
+const cost = 30;
+const coinCollectibleItem = document.getElementById('coinCollectibleItem');
+if (coinCollectibleItem.classList.contains('locked')) {
+showPurchaseMessage('Item is locked', false);
+return; // Exit the function if the item is locked
+}
+
+if (coins >= cost) {
+coins -= cost;
+localStorage.setItem('coins', coins);
+updateCoinDisplay();
+updateShopCoinDisplay();
+localStorage.setItem('coinCollectiblePurchased', 'true');
+coinCollectiblePurchased = true;
+
+const buyButton = document.getElementById('buyCoinCollectibleBtn');
+if (buyButton) {
+buyButton.innerText = 'Purchased';
+buyButton.disabled = true;
+buyButton.style.backgroundColor = '#808080';
+buyButton.style.cursor = 'not-allowed';
+}
+
+showPurchaseMessage('Bought Coin Collectible');
+showItemsBasedOnPurchases();
+} else {
+showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
+}
+}
+
+function purchaseBetterInvincibility() {
+const cost = 50;
+const betterInvincibilityItem = document.getElementById('betterInvincibilityItem'); 
+if (betterInvincibilityItem.classList.contains('locked')) {
+showPurchaseMessage('Item is locked', false);
+return; // Exit the function if the item is locked
+}
+
+if (coins >= cost) {
+coins -= cost;
+localStorage.setItem('coins', coins);
+updateCoinDisplay();
+updateShopCoinDisplay();
+
+localStorage.setItem('betterInvincibilityPurchased', 'true');
+betterInvincibilityPurchased = true;
+invincibilityHitBonus = 1;
+
+const buyButton = document.getElementById('buyBetterInvincibilityBtn');
+if (buyButton) {
+buyButton.innerText = 'Purchased';
+buyButton.disabled = true;
+buyButton.style.backgroundColor = '#808080';
+buyButton.style.cursor = 'not-allowed';
+}
+
+showPurchaseMessage('Bought Better Invincibility!');
+} else {
+showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
+}
+}
+
+function purchaseDoubleCoinSpawn() {
+const cost = 75;
+const doubleCoinSpawnItem = document.getElementById('doubleCoinSpawnItem'); 
+if (doubleCoinSpawnItem.classList.contains('locked')) {
+showPurchaseMessage('Item is locked', false);
+return; // Exit the function if the item is locked
+}
+
+if (coins >= cost) {
+coins -= cost;
+localStorage.setItem('coins', coins);
+updateCoinDisplay();
+updateShopCoinDisplay();
+
+localStorage.setItem('doubleCoinSpawnPurchased', 'true');
+doubleCoinSpawnPurchased = true;
+coinSpawnMultiplier = 2;
+
+const buyButton = document.getElementById('buyDoubleCoinSpawnBtn');
+if (buyButton) {
+buyButton.innerText = 'Purchased';
+buyButton.disabled = true;
+buyButton.style.backgroundColor = '#808080';
+buyButton.style.cursor = 'not-allowed';
+}
+
+showPurchaseMessage('Bought 2x Coin Collectible Spawn!');
+} else {
+showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
+}
+}
+
+function purchaseGlowingCoinChance() {
+const cost = 250;
+const glowingCoinChanceItem = document.getElementById('glowingCoinChanceItem'); 
+if (glowingCoinChanceItem.classList.contains('locked')) {
+showPurchaseMessage('Item is locked', false);
+return; // Exit the function if the item is locked
+}
+
+if (coins >= cost) {
+coins -= cost;
+localStorage.setItem('coins', coins);
+updateCoinDisplay();
+updateShopCoinDisplay();
+
+localStorage.setItem('glowingCoinChancePurchased', 'true');
+glowingCoinChancePurchased = true;
+
+const buyButton = document.getElementById('buyGlowingCoinChanceBtn');
+if (buyButton) {
+buyButton.innerText = 'Purchased';
+buyButton.disabled = true;
+buyButton.style.backgroundColor = '#808080';
+buyButton.style.cursor = 'not-allowed';
+}
+
+showPurchaseMessage('Bought Glowing Coin Chance!');
+} else {
+showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
+}
+}
+
+function updateShopButtonState() {
+const buyPowerupTimerBtn = document.getElementById('buyPowerupTimerBtn');
+const isPowerupTimerPurchased = localStorage.getItem('morePowerupTimerPurchased') === 'true';
+
+if (buyPowerupTimerBtn) {
+if (isPowerupTimerPurchased) {
+buyPowerupTimerBtn.innerText = 'Purchased';
+buyPowerupTimerBtn.disabled = true;
+buyPowerupTimerBtn.style.backgroundColor = '#808080';
+buyPowerupTimerBtn.style.cursor = 'not-allowed';
+} else {
+buyPowerupTimerBtn.innerText = 'Buy (125 Coins)';
+buyPowerupTimerBtn.disabled = false;
+buyPowerupTimerBtn.style.backgroundColor = '#FFD700';
+buyPowerupTimerBtn.style.cursor = 'pointer';
+}
+}
+
+const buySpawningHPBtn = document.getElementById('buySpawningHPBtn');
+const isSpawningHPPurchased = localStorage.getItem('spawningHPPurchased') === 'true';
+
+if (buySpawningHPBtn) {
+if (isSpawningHPPurchased) {
+buySpawningHPBtn.innerText = 'Purchased';
+buySpawningHPBtn.disabled = true;
+buySpawningHPBtn.style.backgroundColor = '#808080';
+buySpawningHPBtn.style.cursor = 'not-allowed';
+} else {
+buySpawningHPBtn.innerText = 'Buy (25 Coins)';
+buySpawningHPBtn.disabled = false;
+buySpawningHPBtn.style.backgroundColor = '#FFD700';
+buySpawningHPBtn.style.cursor = 'pointer';
+}
+}
+
+const buyCoinCollectibleBtn = document.getElementById('buyCoinCollectibleBtn');
+const isCoinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true';
+
+if (buyCoinCollectibleBtn) {
+if (isCoinCollectiblePurchased) {
+buyCoinCollectibleBtn.innerText = 'Purchased';
+buyCoinCollectibleBtn.disabled = true;
+buyCoinCollectibleBtn.style.backgroundColor = '#808080';
+buyCoinCollectibleBtn.style.cursor = 'not-allowed';
+} else {
+buyCoinCollectibleBtn.innerText = 'Buy (30 Coins)';
+buyCoinCollectibleBtn.disabled = false;
+buyCoinCollectibleBtn.style.backgroundColor = '#FFD700';
+buyCoinCollectibleBtn.style.cursor = 'pointer';
+}
+}
+
+const buyGlowingCoinChanceBtn = document.getElementById('buyGlowingCoinChanceBtn');
+const isGlowingCoinChancePurchased = localStorage.getItem('glowingCoinChancePurchased') === 'true';
+
+if (buyGlowingCoinChanceBtn) {
+if (isGlowingCoinChancePurchased) {
+buyGlowingCoinChanceBtn.innerText = 'Purchased';
+buyGlowingCoinChanceBtn.disabled = true;
+buyGlowingCoinChanceBtn.style.backgroundColor = '#808080';
+buyGlowingCoinChanceBtn.style.cursor = 'not-allowed';
+} else {
+buyGlowingCoinChanceBtn.innerText = 'Buy (250 Coins)';
+buyGlowingCoinChanceBtn.disabled = false;
+buyGlowingCoinChanceBtn.style.backgroundColor = '#FFD700';
+buyGlowingCoinChanceBtn.style.cursor = 'pointer';
+}
+}
+
+const buyDoubleCoinSpawnBtn = document.getElementById('buyDoubleCoinSpawnBtn');
+const isDoubleCoinSpawnPurchased = localStorage.getItem('doubleCoinSpawnPurchased') === 'true';
+
+if (buyDoubleCoinSpawnBtn) {
+if (isDoubleCoinSpawnPurchased) {
+buyDoubleCoinSpawnBtn.innerText = 'Purchased';
+buyDoubleCoinSpawnBtn.disabled = true;
+buyDoubleCoinSpawnBtn.style.backgroundColor = '#808080';
+buyDoubleCoinSpawnBtn.style.cursor = 'not-allowed';
+} else {
+buyDoubleCoinSpawnBtn.innerText = 'Buy (75 Coins)';
+buyDoubleCoinSpawnBtn.disabled = false;
+buyDoubleCoinSpawnBtn.style.backgroundColor = '#FFD700';
+buyDoubleCoinSpawnBtn.style.cursor = 'pointer';
+}
+}
+
+const buyBetterInvincibilityBtn = document.getElementById('buyBetterInvincibilityBtn');
+const isBetterInvincibilityPurchased = localStorage.getItem('betterInvincibilityPurchased') === 'true';
+
+if (buyBetterInvincibilityBtn) {
+if (isBetterInvincibilityPurchased) {
+buyBetterInvincibilityBtn.innerText = 'Purchased';
+buyBetterInvincibilityBtn.disabled = true;
+buyBetterInvincibilityBtn.style.backgroundColor = '#808080';
+buyBetterInvincibilityBtn.style.cursor = 'not-allowed';
+} else {
+buyBetterInvincibilityBtn.innerText = 'Buy (50 Coins)';
+buyBetterInvincibilityBtn.disabled = false ;
+buyBetterInvincibilityBtn.style.backgroundColor = '#FFD700';
+buyBetterInvincibilityBtn.style.cursor = 'pointer';
+}
+}
+}
+
+function showItemsBasedOnPurchases() {
+const spawningHPPurchased = localStorage.getItem('spawningHPPurchased') === 'true';
+const coinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true';
+
+// Update lock status of Better Invincibility item
+const betterInvincibilityItem = document.getElementById('betterInvincibilityItem');
+if (spawningHPPurchased) {
+betterInvincibilityItem.classList.remove('locked');
+} else {
+betterInvincibilityItem.classList.add('locked');
+}
+
+// Update lock status of coin-related items
+const doubleCoinSpawnItem = document.getElementById('doubleCoinSpawnItem');
+const powerupTimerItem = document.getElementById('powerupTimerItem');
+const glowingCoinChanceItem = document.getElementById('glowingCoinChanceItem');
+
+if (coinCollectiblePurchased) {
+doubleCoinSpawnItem.classList.remove('locked');
+powerupTimerItem.classList.remove('locked');
+glowingCoinChanceItem.classList.remove('locked');
+} else {
+doubleCoinSpawnItem.classList.add('locked');
+powerupTimerItem.classList.add('locked');
+glowingCoinChanceItem.classList.add('locked');
+}
+
+// Ensure initially visible items are unlocked and set to display: 'flex'
+document.getElementById('spawningHPItem').style.display = 'flex';
+document.getElementById('spawningHPItem').classList.remove('locked');
+document.getElementById('coinCollectibleItem').style.display = 'flex';
+document.getElementById('coinCollectibleItem').classList.remove('locked');
+
+// Sort shop items by cost
+sortShopItems();
+}
+
+function showAlertModal(title, message) {
+modalTitle.innerText = title;
+modalMessage.innerText = message;
+modal.style.display = 'flex';
+}
+
+function showConfirmationModal(title, message, onConfirm) {
+modalTitle.innerText = title;
+modalMessage.innerText = message;
+
+modal.innerHTML = `
+
+<div id="modalContent">
+<h2>${title}</h2>
+<p>${message}</p>
+<button onclick="handleConfirm()">Yes</button>
+<button onclick="closeModal()">No</button>
+</div>
+`;
+window.handleConfirm = function() {
+onConfirm();
+closeModal();
+window.handleConfirm = null;
+};
+
+modal.style.display = 'flex';
+}
+
+function closeModal() {
+modal.style.display = 'none';
+modal.innerHTML = `
+
+<div id="modalContent">
+<h2 id="modalTitle">Title</h2>
+<p id="modalMessage">Message</p>
+<button onclick="closeModal()">OK</button>
+</div>
+`;
+}
+
+function showPurchaseMessage(message, isSuccess = true) {
+purchaseMessage.innerText = message;
+purchaseMessage.style.backgroundColor = isSuccess ? 'black' : 'red'; // Set background color based on isSuccess
+purchaseMessage.style.display = 'block';
+setTimeout(() => {
+purchaseMessage.style.display = 'none';
+}, 2000); // Message disappears after 2 seconds
+}
+
+function gameLoop() {
+if (gameOver) return;
+
+ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+cameraOffsetY += (cameraTargetY - cameraOffsetY) * 0.05;
+
+let elapsedTime = Date.now() - startTime;
+if (elapsedTime >= groundSafeTime) {
+if (!timeStopActive) {
+groundIsDeadly = true;
+groundSpeed = 0.5;
+}
+}
+
+if (groundSpeed > 0 && !timeStopActive) {
+groundY -= groundSpeed;
+}
+
+player.update();
+player.updatePowerUps();
+
+ctx.fillStyle = groundIsDeadly ? '#8B0000' : '#654321';
+ctx.fillRect(0, groundY - cameraOffsetY, GAME_WIDTH, GAME_HEIGHT - groundY + cameraOffsetY);
+
+for (let platform of platforms) {
+platform.update();
+platform.draw();
+}
+
+platforms = platforms.filter(platform => !platform.shouldRemove());
+
+while (lastPlatformY > player.y - 2 * GAME_HEIGHT) {
+addPlatformsRow();
+generateObstaclesRow(lastPlatformY - 60);
+}
+
+for (let obstacle of obstacles) {
+obstacle.update();
+obstacle.draw();
+}
+
+obstacles = obstacles.filter(obstacle => !obstacle.shouldRemove());
+
+for (let obstacle of flightObstacles) {
+obstacle.update();
+obstacle.draw();
+}
+
+for (let powerUp of powerUps) {
+powerUp.draw();
+}
+
+for (let coinCollectible of coinCollectibles) {
+coinCollectible.draw();
+}
+
+player.draw();
+
+if (timeStopActive) {
+applyTimeStopEffect();
+}
+
+updatePowerUpDisplay();
+
+requestAnimationFrame(gameLoop);
+}
+
+window.addEventListener('resize', function() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+GAME_WIDTH = canvas.width;
+GAME_HEIGHT = canvas.height;
+groundY = GAME_HEIGHT - 20;
+});
+
+startMenu.style.display = 'flex';
+updateCoinDisplay();
+</script>
+
+</body>
+</html>
