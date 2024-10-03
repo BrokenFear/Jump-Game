@@ -5,211 +5,228 @@
 <title>Upward Climb Game with HP Limit, Enhanced Power-Ups, Collapsing Platforms, and Coin System</title>
 <style>
 body {
-margin: 0;
-background-color: #87CEEB; /* Sky blue background */
-overflow: hidden;
+    margin: 0;
+    background-color: #87CEEB; /* Sky blue background */
+    overflow: hidden;
 }
+
 #gameCanvas {
-display: block;
-margin: 0;
-background-color: #87CEEB;
+    display: block;
+    margin: 0;
+    background-color: #87CEEB;
 }
 
 /* Updated scoreBoard to include Coins */
 #scoreBoard {
-position: fixed;
-top: 10px;
-left: 10px;
-font-family: Arial, sans-serif;
-font-size: 20px;
-color: #fff;
-text-shadow: 1px 1px 2px #000;
-z-index: 1;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    z-index: 1;
 }
 
 #powerUpDisplay {
-position: fixed;
-top: 50px;
-left: 10px;
-font-family: Arial, sans-serif;
-font-size: 18px;
-color: #fff;
-text-shadow: 1px 1px 2px #000;
-z-index: 1;
-white-space: pre-line; /* Preserve line breaks */
+    position: fixed;
+    top: 50px;
+    left: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    z-index: 1;
+    white-space: pre-line; /* Preserve line breaks */
 }
 
 #startMenu, #infoMenu, #shopMenu, #gameOverScreen, #modal {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background-color: rgba(135, 206, 235, 0.95); /* Semi-transparent sky blue */
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-font-family: Arial, sans-serif;
-color: #fff;
-z-index: 2;
-overflow-y: auto;
-padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(135, 206, 235, 0.95); /* Semi-transparent sky blue */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    z-index: 2;
+    overflow-y: auto;
+    padding: 20px;
 }
 
 #startMenu h1, #infoMenu h1, #shopMenu h1, #gameOverScreen h1, #modal h2 {
-font-size: 48px;
-margin-bottom: 20px;
+    font-size: 48px;
+    margin-bottom: 20px;
 }
 
 #startMenu button, #infoMenu button, #shopMenu button, #gameOverScreen button, #modal button {
-padding: 10px 20px;
-font-size: 20px;
-background-color: #32CD32;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-color: #fff;
-margin: 10px;
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #32CD32;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+    margin: 10px;
 }
 
 #startMenu button:hover, #infoMenu button:hover, #shopMenu button:hover, #gameOverScreen button:hover, #modal button:hover {
-background-color: #228B22;
+    background-color: #228B22;
 }
 
-#infoMenu .power-up, #shopMenu .shop-item {
-display: flex;
-align-items: center;
-margin: 5px 0;
+#infoMenu .power-up {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
 }
 
-#infoMenu .power-up .icon, #shopMenu .shop-item .icon {
-width: 30px;
-height: 30px;
-border-radius: 50%;
-margin-right: 10px;
-position: relative;
+#infoMenu .power-up .icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+    position: relative;
 }
 
-#infoMenu .power-up .icon.glowing, #shopMenu .shop-item .icon.glowing::after {
-/* Glowing effect */
-}
-
-#infoMenu .power-up .icon.glowing::after, #shopMenu .shop-item .icon.glowing::after {
-content: '';
-position: absolute;
-top: -5px;
-left: -5px;
-width: 40px;
-height: 40px;
-border-radius: 50%;
-border: 3px solid #FFFF00; /* Yellow glow */
-box-sizing: border-box;
+#infoMenu .power-up .icon.glowing::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid #FFFF00; /* Yellow glow */
+    box-sizing: border-box;
 }
 
 #gameOverScreen p {
-font-size: 24px;
-margin-bottom: 10px;
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
 /* Hide menus by default */
 #startMenu, #infoMenu, #shopMenu, #gameOverScreen, #modal {
-display: none;
+    display: none;
 }
 
 /* Coin Display Styling */
 #startMenu .coin-display, #shopMenu .coin-display {
-margin-bottom: 20px;
-font-size: 24px;
-font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Shop Menu Styling */
+#shopMenu {
+    flex-direction: row; /* Arrange items horizontally */
+    flex-wrap: wrap;      /* Allow items to wrap onto multiple lines */
+    justify-content: center;
+    align-items: flex-start;
 }
 
 /* Shop Item Styling */
 #shopMenu .shop-item {
-justify-content: space-between;
-width: 80%;
-max-width: 500px;
-padding: 10px;
-background-color: rgba(255, 255, 255, 0.2);
-border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;  /* Adjust width as needed */
+    height: 150px; /* Adjust height as needed */
+    margin: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    text-align: center;
+}
+
+#shopMenu .shop-item .icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+#shopMenu .shop-item .icon.glowing::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #FFFF00; /* Yellow glow */
+    box-sizing: border-box;
 }
 
 #shopMenu .shop-item .description {
-flex-grow: 1;
-margin-left: 10px;
+    margin-bottom: 10px;
 }
 
 #shopMenu .shop-item button {
-background-color: #FFD700; /* Gold color for purchase buttons */
+    background-color: #FFD700; /* Gold color for purchase buttons */
+    width: 100%; /* Make button full width */
 }
 
 #shopMenu .shop-item button:hover {
-background-color: #FFA500; /* Darker gold/orange on hover */
+    background-color: #FFA500; /* Darker gold/orange on hover */
 }
 
 /* Modal Styling */
 #modal {
-background-color: rgba(0, 0, 0, 0.8);
-flex-direction: column;
-align-items: center;
-justify-content: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 #modalContent {
-background-color: #fff;
-color: #000;
-padding: 20px;
-border-radius: 10px;
-text-align: center;
-max-width: 80%;
+    background-color: #fff;
+    color: #000;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 80%;
 }
 
 #modalContent h2 {
-margin-top: 0;
+    margin-top: 0;
 }
 
 #modalContent button {
-margin-top: 20px;
-background-color: #32CD32;
-color: #fff;
-border: none;
-padding: 10px 20px;
-cursor: pointer;
-border-radius: 5px;
+    margin-top: 20px;
+    background-color: #32CD32;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
 #modalContent button:hover {
-background-color: #228B22;
+    background-color: #228B22;
 }
 
 /* Purchase Message Styling */
 #purchaseMessage {
-position: fixed;
-bottom: 20px;
-left: 50%;
-transform: translateX(-50%);
-background-color: rgba(0, 0, 0, 0.7);
-color: #fff;
-padding: 10px 20px;
-border-radius: 5px;
-display: none;
-z-index: 3;
-font-family: Arial, sans-serif;
-font-size: 16px;
-}
-
-/* Locked Item Styling */
-#shopMenu .shop-item.locked {
-opacity: 0.5; /* Darken out locked items */
-cursor: not-allowed;
-}
-
-#shopMenu .shop-item.locked button {
-background-color: #808080; /* Gray out button */
-cursor: not-allowed;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: none;
+    z-index: 3;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
 }
 </style>
-
 </head>
 <body>
 <!-- Updated scoreBoard to include Coins -->
@@ -301,81 +318,137 @@ cursor: not-allowed;
 </div>
 <button onclick="showStartMenu()">Back</button>
 </div>
-<!-- Shop Menu -->
+<!-- Shop Menu (Updated Layout - Sorted by Cost) -->
 <div id="shopMenu">
-<h1>Shop</h1>
-<!-- Coin Display Added -->
-<div class="coin-display">Coins: <span id="shopCoinCount">0</span></div>
-<!-- Shop Items (Sorted dynamically using JavaScript) -->
-<!-- New Shop Item: +2 Spawning HP -->
-<div class="shop-item" data-cost="25" id="spawningHPItem">
-<div class="icon" style="background-color:#FF69B4;"></div>
-<div class="description">
-<p><strong>+2 Spawning HP</strong></p>
-<p>Gives you +2 spawning HP.</p>
+    <h1>Shop</h1>
+    <!-- Coin Display Added -->
+    <div class="coin-display">Coins: <span id="shopCoinCount">0</span></div>
+
+    <!-- Shop Items (Arranged horizontally and sorted from cheapest to most expensive) -->
+    <div class="shop-item" data-cost="25" id="spawningHPItem">
+        <div class="description">
+            <p><strong>+2 Spawning HP</strong></p>
+            <p>Gives you +2 spawning HP.</p>
+        </div>
+        <button id="buySpawningHPBtn" onclick="purchaseSpawningHP()">Buy (25 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="30" id="coinCollectibleItem">
+        <div class="description">
+            <p><strong>Coin Collectible</strong></p>
+            <p>Gives a chance for coin collectibles to spawn.</p>
+        </div>
+        <button id="buyCoinCollectibleBtn" onclick="purchaseCoinCollectible()">Buy (30 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="50" id="betterInvincibilityItem">
+        <div class="description">
+            <p><strong>Better Invincibility</strong></p>
+            <p>Gives +5 seconds to invincibility and +1 hit.</p>
+        </div>
+        <button id="buyBetterInvincibilityBtn" onclick="purchaseBetterInvincibility()">Buy (50 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="75" id="doubleCoinSpawnItem">
+        <div class="description">
+            <p><strong>2x Coin Spawn</strong></p>
+            <p>Doubles coin spawn rate.</p>
+        </div>
+        <button id="buyDoubleCoinSpawnBtn" onclick="purchaseDoubleCoinSpawn()">Buy (75 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="100" id="maxHPItem">
+        <div class="description">
+            <p><strong>+10 Max HP</strong></p>
+            <p>Increases your max HP by 10.</p>
+        </div>
+        <button id="buyMaxHPBtn" onclick="purchaseMaxHP()">Buy (100 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="125" id="powerupTimerItem">
+        <div class="description">
+            <p><strong>More Powerup Time</strong></p>
+            <p>Gives +5 seconds to powerups (except owie).</p>
+        </div>
+        <button id="buyPowerupTimerBtn" onclick="purchasePowerupTimer()">Buy (125 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="150" id="explosionAbilityItem">
+        <div class="description">
+            <p><strong>Explosion Ability</strong></p>
+            <p>Hold 'E' for 3 seconds to explode!</p>
+            <p>Earn coins based on score.</p>
+        </div>
+        <button id="buyExplosionAbilityBtn" onclick="purchaseExplosionAbility()">Buy (150 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="150" id="naturalRegenItem">
+        <div class="description">
+            <p><strong>Natural Regeneration</strong></p>
+            <p>+2 HP every 15 seconds.</p>
+        </div>
+        <button id="buyNaturalRegenBtn" onclick="purchaseNaturalRegen()">Buy (150 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="200" id="hpGlowChanceItem">
+        <div class="description">
+            <p><strong>+10% HP Glow Chance</strong></p>
+            <p>Increases HP power up glow chance by 10%.</p>
+        </div>
+        <button id="buyHpGlowChanceBtn" onclick="purchaseHpGlowChance()">Buy (200 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="250" id="glowingCoinChanceItem">
+        <div class="description">
+            <p><strong>Glowing Coin Chance</strong></p>
+            <p>Coins have a 30% chance of glowing and giving 50 coins.</p>
+        </div>
+        <button id="buyGlowingCoinChanceBtn" onclick="purchaseGlowingCoinChance()">Buy (250 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="300" id="higherFlightGlowChanceItem">
+        <div class="description">
+            <p><strong>+7% Flight Glow Chance</strong></p>
+            <p>Increases Flight power up glow chance by 7%.</p>
+        </div>
+        <button id="buyHigherFlightGlowChanceBtn" onclick="purchaseHigherFlightGlowChance()">Buy (300 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="500" id="zFlightItem">
+        <div class="description">
+            <p><strong>Z Flight Ability</strong></p>
+            <p>Toggle True Flight with 'Z'.</p>
+            <p>Costs 4 HP to enable, 2 HP every second.</p>
+        </div>
+        <button id="buyZFlightBtn" onclick="purchaseZFlight()">Buy (500 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="600" id="higherDoubleJumpGlowChanceItem">
+        <div class="description">
+            <p><strong>+10% Double Jump Glow Chance</strong></p>
+            <p>Increases Double Jump power up glow chance by 10%.</p>
+        </div>
+        <button id="buyHigherDoubleJumpGlowChanceBtn" onclick="purchaseHigherDoubleJumpGlowChance()">Buy (600 Coins)</button>
+    </div>
+
+    <div class="shop-item" data-cost="700" id="higherInvincibilityGlowChanceItem"> 
+        <div class="description">
+            <p><strong>+5% Invincibility Glow Chance</strong></p>
+            <p>Increases Invincibility power up glow chance by 5%.</p>
+        </div>
+        <button id="buyHigherInvincibilityGlowChanceBtn" onclick="purchaseHigherInvincibilityGlowChance()">Buy (700 Coins)</button>
+    </div>
+
+    <button onclick="showStartMenu()">Back</button>
 </div>
-<button id="buySpawningHPBtn" onclick="purchaseSpawningHP()">Buy (25 Coins)</button>
-</div>
-<!-- Shop Item: Better Invincibility -->
-<div class="shop-item locked" id="betterInvincibilityItem" data-cost="50">
-<div class="icon" style="background-color:#FFFF00;"></div>
-<div class="description">
-<p><strong>Better Invincibility</strong></p>
-<p>Gives +5 seconds to invincibility and +1 to the hit counter. Stacks with "More Powerup Timer".</p>
-</div>
-<button id="buyBetterInvincibilityBtn" onclick="purchaseBetterInvincibility()">Buy (50 Coins)</button>
-</div>
-<!-- Shop Item: Coin Collectible -->
-<div class="shop-item" data-cost="30" id="coinCollectibleItem">
-<div class="icon" style="background-color: #b9b9f3; width: 20px; height: 20px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-transform: translateX(5px);">
-</div>
-<div class="description">
-<p><strong>Coin Collectible</strong></p>
-<p>Gives a chance for coin collectibles to spawn.</p>
-</div>
-<button id="buyCoinCollectibleBtn" onclick="purchaseCoinCollectible()">Buy (30 Coins)</button>
-</div>
-<!-- Shop Item: 2x Coin Collectible Spawn -->
-<div class="shop-item locked" id="doubleCoinSpawnItem" data-cost="75">
-<div class="icon" style="background-color: #b9b9f3; width: 20px; height: 20px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-transform: translateX(5px);">
-</div>
-<div class="description">
-<p><strong>2x Coin Collectible Spawn</strong></p>
-<p>Doubles the spawn rate of coin collectibles.</p>
-</div>
-<button id="buyDoubleCoinSpawnBtn" onclick="purchaseDoubleCoinSpawn()">Buy (75 Coins)</button>
-</div>
-<!-- Shop Item: More Powerup Timer -->
-<div class="shop-item locked" data-cost="125" id="powerupTimerItem">
-<div class="icon" style="background-color:#1E90FF;">
-</div>
-<div class="description">
-<p><strong>More Powerup Timer</strong></p>
-<p>Gives +5 seconds to all powerups except owie.</p>
-</div>
-<button id="buyPowerupTimerBtn" onclick="purchasePowerupTimer()">Buy (125 Coins)</button>
-</div>
-<!-- Shop Item: Glowing Coin Chance -->
-<div class="shop-item locked" id="glowingCoinChanceItem" data-cost="250">
-<div class="icon glowing" style="background-color: #b9b9f3; width: 20px; height: 20px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-transform: translateX(5px);">
-</div>
-<div class="description">
-<p><strong>Glowing Coin Chance</strong></p>
-<p>All Coin Collectibles have a 30% chance of glowing and giving 50 coins instead.</p>
-</div>
-<button id="buyGlowingCoinChanceBtn" onclick="purchaseGlowingCoinChance()">Buy (250 Coins)</button>
-</div>
-<button onclick="showStartMenu()">Back</button>
-</div>
+
 <!-- Game Over Screen -->
 <div id="gameOverScreen">
 <h1>Game Over</h1>
 <p>Your Score: <span id="finalScore">0</span></p>
 <p>High Score: <span id="highScore">0</span></p>
-<!-- Removed "Coins Earned:" text -->
+<p>Bonus Coins: <span id="highScoreBonus">0</span></p> 
+<p>Explosion Bonus Coins: <span id="explosionBonusCoins">0</span></p> 
 <button onclick="restartGame()">Play Again</button>
 <button onclick="showStartMenu()">Return to Main Menu</button>
 </div>
@@ -396,6 +469,8 @@ const scoreBoard = document.getElementById('scoreBoard');
 const gameOverScreen = document.getElementById('gameOverScreen');
 const finalScoreDisplay = document.getElementById('finalScore');
 const highScoreDisplay = document.getElementById('highScore');
+const highScoreBonusDisplay = document.getElementById('highScoreBonus');
+const explosionBonusCoinsDisplay = document.getElementById('explosionBonusCoins');
 const powerUpDisplay = document.getElementById('powerUpDisplay');
 const startMenu = document.getElementById('startMenu');
 const infoMenu = document.getElementById('infoMenu');
@@ -440,47 +515,149 @@ let scoreBaseY;
 let lastUpdateTime = Date.now();
 let nextCoinScore = 1000; // Threshold for awarding next coin
 
+// Load purchase states from localStorage 
 let coinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true';
 let glowingCoinChancePurchased = localStorage.getItem('glowingCoinChancePurchased') === 'true';
 let doubleCoinSpawnPurchased = localStorage.getItem('doubleCoinSpawnPurchased') === 'true';
-let coinSpawnMultiplier = doubleCoinSpawnPurchased ? 2 : 1;
+let powerupTimerPurchased = localStorage.getItem('morePowerupTimerPurchased') === 'true';
+let spawningHPPurchased = localStorage.getItem('spawningHPPurchased') === 'true';
 let betterInvincibilityPurchased = localStorage.getItem('betterInvincibilityPurchased') === 'true';
+let zFlightPurchased = localStorage.getItem('zFlightPurchased') === 'true'; 
+let explosionAbilityPurchased = localStorage.getItem('explosionAbilityPurchased') === 'true';
+let naturalRegenPurchased = localStorage.getItem('naturalRegenPurchased') === 'true'; 
+let hpGlowChancePurchased = localStorage.getItem('hpGlowChancePurchased') === 'true'; 
+let maxHPPurchased = localStorage.getItem('maxHPPurchased') === 'true';
+let higherFlightGlowChancePurchased = localStorage.getItem('higherFlightGlowChancePurchased') === 'true';
+let higherDoubleJumpGlowChancePurchased = localStorage.getItem('higherDoubleJumpGlowChancePurchased') === 'true';
+let higherInvincibilityGlowChancePurchased = localStorage.getItem('higherInvincibilityGlowChancePurchased') === 'true';
+
+let coinSpawnMultiplier = doubleCoinSpawnPurchased ? 2 : 1;
 
 let powerupTimerBonus = parseInt(localStorage.getItem('powerupTimerBonus')) || 0;
 let invincibilityHitBonus = betterInvincibilityPurchased ? 1 : 0;
 
 let spawningHPBonus = parseInt(localStorage.getItem('spawningHPBonus')) || 0;
+let maxHPBonus = parseInt(localStorage.getItem('maxHPBonus')) || 0;
+let zFlightActive = false; 
+let zFlightHpInterval;
+
+let debugMode = false; 
+let infiniteHP = false;
+let infiniteCoins = false;
+let holdingE = false;
+let explosionStartTime = 0;
+
+let hpGlowChanceBonus = hpGlowChancePurchased ? 0.1 : 0;
+let doubleJumpGlowChanceBonus = higherDoubleJumpGlowChancePurchased ? 0.1 : 0;
+let flightGlowChanceBonus = higherFlightGlowChancePurchased ? 0.07 : 0;
+let invincibilityGlowChanceBonus = higherInvincibilityGlowChancePurchased ? 0.05 : 0; 
+
+// Function to update the visual state of a shop item button
+function updateShopItemButton(itemId, purchased) {
+    const buyButton = document.getElementById(itemId);
+    if (buyButton) {
+        if (purchased) {
+            buyButton.innerText = 'Purchased';
+            buyButton.disabled = true;
+            buyButton.style.backgroundColor = '#808080';
+            buyButton.style.cursor = 'not-allowed';
+        } else {
+            const cost = buyButton.parentElement.getAttribute('data-cost');
+            buyButton.innerText = `Buy (${cost} Coins)`;
+            buyButton.disabled = false;
+            buyButton.style.backgroundColor = '#FFD700';
+            buyButton.style.cursor = 'pointer';
+        }
+    }
+}
 
 document.addEventListener('keydown', function(e) {
-keys[e.code] = true;
+  keys[e.code] = true;
 
-if (e.code === 'Numpad5') {
-showConfirmationModal('Reset Game Data', 'Are you sure you want to reset all game data? This will erase your high score and coins.', () => {
-localStorage.clear();
-highScore = 0;
-coins = 0;
-powerupTimerBonus = 0;
-spawningHPBonus = 0;
-coinCollectiblePurchased = false;
-glowingCoinChancePurchased = false;
-doubleCoinSpawnPurchased = false;
-coinSpawnMultiplier = 1;
-betterInvincibilityPurchased = false;
-invincibilityHitBonus = 0;
-updateCoinDisplay();
-updateShopCoinDisplay();
-updateShopButtonState();
-showPurchaseMessage('Game Data Reset');
-});
-}
+  if (e.shiftKey && keys['KeyQ'] && keys['KeyE']) {
+    debugMode = !debugMode;
+    showPurchaseMessage(debugMode ? "Debug Mode Enabled" : "Debug Mode Disabled");
+  }
+
+  if (e.code === 'Numpad5') {
+    showConfirmationModal('Reset Game Data', 'Are you sure you want to reset all game data? This will erase your high score and coins.', () => {
+      localStorage.clear();
+      highScore = 0;
+      coins = 0;
+      powerupTimerBonus = 0;
+      spawningHPBonus = 0;
+      maxHPBonus = 0;
+      coinCollectiblePurchased = false;
+      glowingCoinChancePurchased = false;
+      doubleCoinSpawnPurchased = false;
+      coinSpawnMultiplier = 1;
+      betterInvincibilityPurchased = false;
+      invincibilityHitBonus = 0;
+      zFlightPurchased = false; 
+      explosionAbilityPurchased = false;
+      naturalRegenPurchased = false;
+      hpGlowChancePurchased = false;
+      maxHPPurchased = false;
+      higherFlightGlowChancePurchased = false;
+      higherDoubleJumpGlowChancePurchased = false;
+      higherInvincibilityGlowChancePurchased = false;
+
+      updateCoinDisplay();
+      updateShopCoinDisplay();
+      updateShopButtonState();
+      showPurchaseMessage('Game Data Reset');
+    });
+  }
+
+  if (e.code === 'KeyZ' && zFlightPurchased) {
+    toggleZFlight();
+  }
+
+  if (debugMode && keys['Numpad1']) {
+    infiniteHP = !infiniteHP;
+    if (infiniteHP) {
+        player.hp = Infinity; 
+        showPurchaseMessage('Infinite HP Enabled', true);
+        powerUps = powerUps.filter(powerUp => powerUp.type !== 'hpBoost');
+    } else {
+        player.hp = player.maxHP; // Reset to max HP
+        showPurchaseMessage('Infinite HP Disabled');
+    }
+  }
+
+  if ((debugMode && keys['Numpad2']) || (!debugMode && startMenu.style.display === 'flex' && keys['Numpad2'])) {
+    infiniteCoins = !infiniteCoins;
+    if (infiniteCoins) {
+        coins = Infinity; 
+        updateCoinDisplay(); 
+        updateShopCoinDisplay(); 
+        showPurchaseMessage('Infinite Coins Enabled', true);
+    } else {
+        coins = parseInt(localStorage.getItem('coins')) || 0; // Reset to stored coins
+        updateCoinDisplay();
+        updateShopCoinDisplay();
+        showPurchaseMessage('Infinite Coins Disabled');
+    }
+  }
+
+  if (explosionAbilityPurchased && e.code === 'KeyE' && !holdingE) {
+    holdingE = true;
+    explosionStartTime = Date.now();
+  }
 });
 
 document.addEventListener('keyup', function(e) {
-keys[e.code] = false;
+  keys[e.code] = false;
+
+  if (e.code === 'KeyE') {
+    holdingE = false;
+  }
 });
 
+let explosionParticles = [];
+
 class Player {
-constructor(spawningHPBonus = 0) {
+constructor(spawningHPBonus = 0, maxHPBonus = 0) {
 this.width = 40;
 this.height = 50;
 this.x = (GAME_WIDTH - this.width) / 2;
@@ -496,7 +673,7 @@ this.hasDoubleJumped = false;
 this.isInvincible = false;
 this.invincibilityHitsRemaining = 0;
 this.hp = 3 + spawningHPBonus;
-this.maxHP = 15;
+this.maxHP = 15 + maxHPBonus; // Start with base HP + bonus
 this.canFly = false;
 this.isOwie = false;
 this.canTrueFly = false;
@@ -624,8 +801,22 @@ totalScore += scoreThisRun;
 scoreThisRun = 0;
 } else {
 gameOver = true;
-finalScoreDisplay.innerText = score;
-updateCoins(0);
+
+// Calculate High Score Bonus
+let highScoreBonus = Math.floor(score / 25000) * 10;finalScoreDisplay.innerText = score;
+highScoreBonusDisplay.innerText = highScoreBonus;
+let totalBonusCoins = highScoreBonus; 
+
+// Calculate Explosion Bonus Coins
+let explosionBonusCoins = 0;
+if (diedToExplosion) {
+explosionBonusCoins = Math.floor(score / 5000);
+explosionBonusCoinsDisplay.innerText = explosionBonusCoins;
+totalBonusCoins += explosionBonusCoins;
+}
+
+updateCoins(totalBonusCoins); 
+
 if (score > highScore) {
 highScore = score;
 localStorage.setItem('highScore', highScore);
@@ -665,8 +856,24 @@ obstacles.splice(obstacles.indexOf(obstacle), 1);
 this.hp -= 1;
 if (this.hp <= 0) {
 gameOver = true;
+
+// Calculate High Score Bonus
+let highScoreBonus = Math.floor(score / 25000) * 10;
+
 finalScoreDisplay.innerText = score;
-updateCoins(0);
+highScoreBonusDisplay.innerText = highScoreBonus;
+let totalBonusCoins = highScoreBonus; 
+
+// Calculate Explosion Bonus Coins
+let explosionBonusCoins = 0;
+if (diedToExplosion) {
+explosionBonusCoins = Math.floor(score /5000);
+explosionBonusCoinsDisplay.innerText = explosionBonusCoins;
+totalBonusCoins += explosionBonusCoins;
+}
+
+updateCoins(totalBonusCoins);
+
 if (score > highScore) {
 highScore = score;
 localStorage.setItem('highScore', highScore);
@@ -695,8 +902,24 @@ delete activePowerUps['invincibility'];
 this.hp -= 1;
 if (this.hp <= 0) {
 gameOver = true;
+
+// Calculate High Score Bonus
+let highScoreBonus = Math.floor(score / 25000) * 10;
+
 finalScoreDisplay.innerText = score;
-updateCoins(0);
+highScoreBonusDisplay.innerText = highScoreBonus; 
+let totalBonusCoins = highScoreBonus;
+
+// Calculate Explosion Bonus Coins
+let explosionBonusCoins = 0;
+if (diedToExplosion) {
+explosionBonusCoins = Math.floor(score / 5000);
+explosionBonusCoinsDisplay.innerText = explosionBonusCoins;
+totalBonusCoins += explosionBonusCoins;
+}
+
+updateCoins(totalBonusCoins); 
+
 if (score > highScore) {
 highScore = score;
 localStorage.setItem('highScore', highScore);
@@ -715,13 +938,20 @@ this.x < powerUp.x + powerUp.size &&
 this.y + this.height > powerUp.y &&
 this.y < powerUp.y + powerUp.size) {
 
+// Check if the powerup should be collected
+let shouldCollect = true;
+if (zFlightActive && powerUp.originalColor === '#FF0000') { 
+shouldCollect = false;
+}
+
+if (shouldCollect) {
 if (powerUp.isGlowing) {
 this.collectGlowingPowerUp(powerUp.type);
 } else {
 this.activatePowerUp(powerUp.type);
 }
-
 powerUps.splice(i, 1);
+}
 }
 }
 
@@ -747,8 +977,24 @@ coinCollectibles.splice(i, 1);
 
 if (this.y > groundY + 200) {
 gameOver = true;
+
+// Calculate High Score Bonus
+let highScoreBonus = Math.floor(score / 25000) * 10;
+
 finalScoreDisplay.innerText = score;
-updateCoins(0);
+highScoreBonusDisplay.innerText = highScoreBonus;
+let totalBonusCoins = highScoreBonus; 
+
+// Calculate Explosion Bonus Coins
+let explosionBonusCoins = 0;
+if (diedToExplosion) {
+explosionBonusCoins = Math.floor(score / 5000);
+explosionBonusCoinsDisplay.innerText = explosionBonusCoins;
+totalBonusCoins += explosionBonusCoins;
+}
+
+updateCoins(totalBonusCoins);
+
 if (score > highScore) {
 highScore = score;
 localStorage.setItem('highScore', highScore);
@@ -770,54 +1016,113 @@ if (score >= nextCoinScore) {
 updateCoins(1); // Award 1 coin
 nextCoinScore += 1000; // Increase threshold for next coin
 }
+
+// Explosion Logic
+if (holdingE && explosionAbilityPurchased && Date.now() - explosionStartTime >= 3000) {
+diedToExplosion = true;
+this.hp = 0;
+
+// Create explosion particles
+for (let i = 0; i < 20; i++) {
+let particleSize = Math.random() * 15 + 5;
+explosionParticles.push({
+x: this.x + this.width / 2,
+y: this.y + this.height / 2 - cameraOffsetY,
+size: particleSize,
+color: this.isTrueInvincible ? '#00FF00' : this.isInvincible ? '#FFD700' : '#FF4500',
+vx: (Math.random() - 0.5) * 20,
+vy: (Math.random() - 0.5) * 15 
+});
+}
+
+// Hide the player immediately
+this.width = 0;
+this.height = 0;
+
+// Trigger game over after a very short delay
+setTimeout(() => {
+gameOver = true;
+
+// Calculate High Score Bonus
+let highScoreBonus = Math.floor(score / 25000) * 10;
+
+finalScoreDisplay.innerText = score;
+highScoreBonusDisplay.innerText = highScoreBonus;
+let totalBonusCoins = highScoreBonus; 
+
+// Calculate Explosion Bonus Coins
+let explosionBonusCoins = 0;
+if (diedToExplosion) {
+explosionBonusCoins = Math.floor(score / 5000);
+explosionBonusCoinsDisplay.innerText = explosionBonusCoins;
+totalBonusCoins += explosionBonusCoins;
+}
+
+updateCoins(totalBonusCoins);
+
+if (score > highScore) {
+highScore = score;
+localStorage.setItem('highScore', highScore);
+}
+highScoreDisplay.innerText = highScore;
+gameOverScreen.style.display = 'flex';
+}, 100); 
+}
+
+// Natural Regen Logic
+if (naturalRegenPurchased && Date.now() - lastRegenTime >= 15000) {
+this.hp = Math.min(this.hp + 2, this.maxHP); 
+lastRegenTime = Date.now();
+scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${this.hp}/${this.maxHP}`;
+}
 }
 
 activatePowerUp(type, duration = null) {
 const defaultDurations = {
 doubleJump: 10000,
-invincibility: 16000,
-flight: 10000,
-owie: 3000,
+invincibility: 16000, 
+flight: 10000, 
+owie: 3000, 
 trueFlight: 4000,
 trueInvincibility: 9000,
-timeStop: 30000,
+timeStop: 30000, 
 };
 
 if (type === 'hpBoost') {
-this.hp = Math.min(this.hp + 1, this.maxHP);
+this.hp = Math.min(this.hp + 1, this.maxHP); 
 return;
 }
 
-if (type === 'glowingHpBoost') {
-if (this.maxHP < 50) {
+if (type === 'glowingHpBoost') { 
+if (this.maxHP < 90) { // New max HP cap (75 base + 15 from upgrades)
 let hpIncrease = 3;
-let maxHPIncrease = 5;
-let newMaxHP = Math.min(this.maxHP + maxHPIncrease, 50);
+let maxHPIncrease = 5; 
+let newMaxHP = Math.min(this.maxHP + maxHPIncrease, 90);
 let actualMaxHPIncrease = newMaxHP - this.maxHP;
 this.maxHP = newMaxHP;
-this.hp = Math.min(this.hp + hpIncrease, this.maxHP);
+this.hp = Math.min(this.hp + hpIncrease, this.maxHP); 
 } else {
 this.hp = Math.min(this.hp + 7, this.maxHP);
 }
 
-scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${this.hp}/${this.maxHP}`;
-return;
+scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${this.hp}/${this.maxHP}`; 
+return; 
 }
 
 let powerUpDuration = duration || defaultDurations[type];
 
 if (powerUpDuration === undefined) {
-console.warn(`No duration specified for power-up type: ${type}`);
-return;
+console.warn(`No duration specified for power-up type: ${type}`); 
+return; 
 }
 
-if (type !== 'owie') {
-powerUpDuration += powerupTimerBonus * 5000;
-}
+if (type !== 'owie') { 
+powerUpDuration += powerupTimerBonus * 5000; 
+} 
 
 if (type === 'invincibility' && betterInvincibilityPurchased) {
 powerUpDuration += 5000;
-this.invincibilityHitsRemaining += 1;
+this.invincibilityHitsRemaining += 1; 
 }
 
 if (type === 'doubleJump') {
@@ -826,39 +1131,39 @@ this.canDoubleJump = true;
 this.isInvincible = true;
 this.invincibilityHitsRemaining = 3 + invincibilityHitBonus;
 } else if (type === 'flight') {
-this.canFly = true;
+this.canFly = true; 
 } else if (type === 'owie') {
 this.isOwie = true;
 this.vy = -5;
-} else if (type === 'trueFlight') {
-this.canTrueFly = true;
-} else if (type === 'trueInvincibility') {
-this.isTrueInvincible = true;
-} else if (type === 'timeStop') {
+} else if (type === 'trueFlight') { 
+this.canTrueFly = true; 
+} else if (type === 'trueInvincibility') { 
+this.isTrueInvincible = true; 
+} else if (type === 'timeStop') { 
 timeStopActive = true;
-}
+} 
 
 activePowerUps[type] = {
 remainingTime: powerUpDuration,
-};
-} // <-- Missing brace was here!
+}; 
+}
 
 collectGlowingPowerUp(type) {
 if (type === 'doubleJump') {
-this.activatePowerUp('timeStop', 30000);
+this.activatePowerUp('timeStop', 30000); 
 } else if (type === 'invincibility') {
 this.activatePowerUp('trueInvincibility', 15000);
-} else if (type === 'flight') {
+} else if (type === 'flight') { 
 this.activatePowerUp('trueFlight', 15000);
 } else if (type === 'hpBoost') {
-this.activatePowerUp('glowingHpBoost');
+this.activatePowerUp('glowingHpBoost'); 
 }
-}
+} 
 
 updatePowerUps() {
-let currentTime = Date.now();
-let deltaTime = currentTime - lastUpdateTime;
-lastUpdateTime = currentTime;
+let currentTime = Date.now(); 
+let deltaTime = currentTime - lastUpdateTime; 
+lastUpdateTime = currentTime; 
 
 let timeMultiplier = timeStopActive ? 0.5 : 1;
 
@@ -866,37 +1171,37 @@ for (let [type, powerUpData] of Object.entries(activePowerUps)) {
 let actualTimeMultiplier = (timeStopActive && type !== 'timeStop') ? timeMultiplier : 1;
 
 if (type === 'timeStop') {
-powerUpData.remainingTime -= deltaTime;
-} else {
+powerUpData.remainingTime -= deltaTime; 
+} else { 
 powerUpData.remainingTime -= deltaTime * actualTimeMultiplier;
 }
 
 if (powerUpData.remainingTime <= 0) {
-if (type === 'doubleJump') {
+if (type === 'doubleJump') { 
 this.canDoubleJump = false;
-} else if (type === 'invincibility') {
+} else if (type === 'invincibility') { 
 this.isInvincible = false;
-} else if (type === 'flight') {
-this.canFly = false;
-flightObstacles = [];
-} else if (type === 'owie') {
+} else if (type === 'flight') { 
+this.canFly = false; 
+flightObstacles = []; 
+} else if (type === 'owie') { 
 this.isOwie = false;
 } else if (type === 'trueFlight') {
-this.canTrueFly = false;
-} else if (type === 'trueInvincibility') {
+this.canTrueFly = false; 
+} else if (type === 'trueInvincibility') { 
 this.isTrueInvincible = false;
-} else if (type === 'timeStop') {
+} else if (type === 'timeStop') { 
 timeStopActive = false;
 }
 delete activePowerUps[type];
-}
+} 
 }
 }
 
 draw() {
-ctx.fillStyle = this.isTrueInvincible ? '#00FF00' : this.isInvincible ? '#FFD700' : '#FF4500';
-if (this.canFly || this.canTrueFly) {
-ctx.fillStyle = '#FFFFFF';
+ctx.fillStyle = this.isTrueInvincible ? '#00FF00' : this.isInvincible ? '#FFD700' : '#FF4500'; 
+if (this.canFly || this.canTrueFly) { 
+ctx.fillStyle = '#FFFFFF'; 
 }
 if (this.isOwie) {
 ctx.fillStyle = '#FFA500';
@@ -904,42 +1209,49 @@ ctx.fillStyle = '#FFA500';
 ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
 
 if (this.isInvincible && !this.isTrueInvincible) {
-ctx.fillStyle = '#000000';
+ctx.fillStyle = '#000000'; 
 ctx.font = '20px Arial';
 ctx.fillText(this.invincibilityHitsRemaining, this.x + this.width / 2 - 5, this.y - cameraOffsetY + this.height / 2 + 7);
 }
 if (this.isTrueInvincible) {
-ctx.fillStyle = '#000000';
+ctx.fillStyle = '#000000'; 
 ctx.font = '20px Arial';
-ctx.fillText('∞', this.x + this.width / 2 - 5, this.y - cameraOffsetY + this.height / 2 + 7);
-}
-}
+ctx.fillText('∞', this.x + this.width / 2 - 5, this.y - cameraOffsetY + this.height / 2 + 7); 
+} 
+
+// Explosion Charging Indicator
+if (holdingE && explosionAbilityPurchased) {
+let chargePercent = Math.min((Date.now() - explosionStartTime) / 3000, 1); 
+ctx.fillStyle = 'rgba(255, 165, 0, 0.5)'; // Orange
+ctx.fillRect(this.x, this.y - cameraOffsetY - 10, this.width * chargePercent, 5);
+} 
+} 
 }
 
 class Platform {
-constructor(x, y, width, height, isMoving = false, isCollapsing = false) {
+constructor(x, y, width, height, isMoving = false, isCollapsing = false) { 
 this.x = x;
 this.y = y;
-this.width = width;
+this.width = width; 
 this.height = height;
-this.isMoving = isMoving;
-this.isCollapsing = isCollapsing;
-this.hasCollapsingTriggered = false;
-this.collapseTimer = 0;
+this.isMoving = isMoving; 
+this.isCollapsing = isCollapsing; 
+this.hasCollapsingTriggered = false; 
+this.collapseTimer = 0; 
 this.vx = isMoving ? (Math.random() < 0.5 ? -2 : 2) : 0;
 }
 
-update() {
+update() { 
 if (this.isMoving && !timeStopActive) {
 this.x += this.vx;
-if (this.x < 0 || this.x + this.width > GAME_WIDTH) {
-this.vx *= -1;
+if (this.x < 0 || this.x + this.width > GAME_WIDTH) { 
+this.vx *= -1; 
 }
 }
 
 if (this.isCollapsing && this.hasCollapsingTriggered && !timeStopActive) {
-this.collapseTimer -= 16;
-if (this.collapseTimer <= 0) {
+this.collapseTimer -= 16; 
+if (this.collapseTimer <= 0) { 
 platforms.splice(platforms.indexOf(this), 1);
 }
 }
@@ -947,24 +1259,24 @@ platforms.splice(platforms.indexOf(this), 1);
 
 startCollapse() {
 this.hasCollapsingTriggered = true;
-this.collapseTimer = 3000;
+this.collapseTimer = 3000; 
 }
 
 shouldRemove() {
 return this.y > groundY;
 }
 
-draw() {
-if (this.isCollapsing) {
-ctx.fillStyle = '#8B4513';
+draw() { 
+if (this.isCollapsing) { 
+ctx.fillStyle = '#8B4513'; 
 } else {
-ctx.fillStyle = this.isMoving ? '#32CD32' : '#228B22';
-}
+ctx.fillStyle = this.isMoving ? '#32CD32' : '#228B22'; 
+} 
 ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
 
 if (this.isCollapsing && this.hasCollapsingTriggered) {
 ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
+ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height); 
 }
 }
 }
@@ -972,42 +1284,42 @@ ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
 class Obstacle {
 constructor(x, y, width, height, color = '#8B0000', vx = 0, vy = 0) {
 this.x = x;
-this.y = y;
+this.y = y; 
 this.width = width;
-this.height = height;
-this.color = color;
+this.height = height; 
+this.color = color; 
 this.vx = vx;
 this.vy = vy;
 }
 
-update() {
+update() { 
 if (!timeStopActive) {
-this.x += this.vx;
-this.y += this.vy;
+this.x += this.vx; 
+this.y += this.vy; 
 
 if (this.x < 0 || this.x + this.width > GAME_WIDTH) {
-this.vx *= -1;
-}
+this.vx *= -1; 
+} 
 if (this.y < 0 || this.y + this.height > groundY) {
-this.vy *= -1;
+this.vy *= -1; 
 }
 }
 }
 
-shouldRemove() {
-return this.y > groundY;
+shouldRemove() { 
+return this.y > groundY; 
 }
 
 draw() {
 ctx.fillStyle = this.color;
-ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height);
+ctx.fillRect(this.x, this.y - cameraOffsetY, this.width, this.height); 
 }
 }
 
 class PowerUp {
 constructor(x, y, type, isGlowing = false) {
 this.x = x;
-this.y = y;
+this.y = y; 
 this.size = 25;
 this.type = type;
 this.isGlowing = isGlowing;
@@ -1017,23 +1329,24 @@ this.color = '#00BFFF';
 } else if (type === 'invincibility') {
 this.color = '#FFD700';
 } else if (type === 'hpBoost') {
-this.color = '#FF0000';
-} else if (type === 'flight') {
-this.color = '#FFFFFF';
-} else if (type === 'owie') {
-this.color = '#FFA500';
+this.color = '#FF0000'; 
+this.originalColor = this.color; 
+} else if (type === 'flight') { 
+this.color = '#FFFFFF'; 
+} else if (type === 'owie') { 
+this.color = '#FFA500'; 
 } else if (type === 'trueFlight') {
 this.color = '#7B68EE';
-} else if (type === 'trueInvincibility') {
-this.color = '#00FF00';
-} else if (type === 'timeStop') {
+} else if (type === 'trueInvincibility') { 
+this.color = '#00FF00'; 
+} else if (type === 'timeStop') { 
 this.color = '#808080';
-}
-}
+} 
+} 
 
-draw() {
+draw() { 
 ctx.fillStyle = this.color;
-ctx.beginPath();
+ctx.beginPath(); 
 ctx.arc(this.x + this.size / 2, this.y - cameraOffsetY + this.size / 2, this.size / 2, 0, Math.PI * 2);
 ctx.fill();
 
@@ -1042,8 +1355,8 @@ ctx.strokeStyle = '#FFFF00';
 ctx.lineWidth = 5;
 ctx.beginPath();
 ctx.arc(this.x + this.size / 2, this.y - cameraOffsetY + this.size / 2, this.size / 2 + 5, 0, Math.PI * 2);
-ctx.stroke();
-}
+ctx.stroke(); 
+} 
 }
 }
 
@@ -1051,85 +1364,85 @@ class CoinCollectible {
 constructor(x, y, isGlowing = false) {
 this.x = x;
 this.y = y;
-this.size = 20;
+this.size = 20; 
 this.color = isGlowing ? '#FFFF00' : '#FFD700';
 this.isGlowing = isGlowing;
 }
 
 draw() {
-ctx.fillStyle = this.color;
+ctx.fillStyle = this.color; 
 ctx.beginPath();
-ctx.moveTo(this.x + this.size / 2, this.y - cameraOffsetY);
-ctx.lineTo(this.x + this.size, this.y - cameraOffsetY + this.size / 2);
+ctx.moveTo(this.x + this.size / 2, this.y - cameraOffsetY); 
+ctx.lineTo(this.x + this.size, this.y - cameraOffsetY + this.size / 2); 
 ctx.lineTo(this.x + this.size / 2, this.y - cameraOffsetY + this.size);
 ctx.lineTo(this.x, this.y - cameraOffsetY + this.size / 2);
-ctx.closePath();
-ctx.fill();
+ctx.closePath(); 
+ctx.fill(); 
 
-if (this.isGlowing) {
+if (this.isGlowing) { 
 ctx.strokeStyle = '#FFFFFF';
-ctx.lineWidth = 3;
+ctx.lineWidth = 3; 
 ctx.beginPath();
 ctx.moveTo(this.x + this.size / 2, this.y - cameraOffsetY - 5);
 ctx.lineTo(this.x + this.size + 5, this.y - cameraOffsetY + this.size / 2);
 ctx.lineTo(this.x + this.size / 2, this.y - cameraOffsetY + this.size + 5);
 ctx.lineTo(this.x - 5, this.y - cameraOffsetY + this.size / 2);
-ctx.closePath();
+ctx.closePath(); 
 ctx.stroke();
-}
-}
-}
+} 
+} 
+} 
 
 function generateInitialPlatforms() {
 platforms = [];
-for (let i = 0; i < 10; i++) {
-addPlatformsRow();
-}
+for (let i = 0; i < 10; i++) { 
+addPlatformsRow(); 
+} 
 }
 
 function addPlatformsRow() {
-let rowY = lastPlatformY - 120;
-lastPlatformY = rowY;
+let rowY = lastPlatformY - 120; 
+lastPlatformY = rowY; 
 let platformsInRow = 3;
 let platformWidth = 100;
-let platformHeight = 15;
+let platformHeight = 15; 
 
-for (let i = 0; i < platformsInRow; i++) {
+for (let i = 0; i < platformsInRow; i++) { 
 let x = (i + Math.random() * 0.5) * (GAME_WIDTH / platformsInRow);
-let isMoving = shouldPlatformMove();
+let isMoving = shouldPlatformMove(); 
 let isCollapsing = Math.random() < 0.1;
 
 platforms.push(new Platform(x, rowY, platformWidth, platformHeight, isMoving, isCollapsing));
 
-if (Math.random() < 0.2) {
-let powerUpType;
-let rand = Math.random();
+if (Math.random() < 0.2) { 
+let powerUpType; 
+let rand = Math.random(); 
 let isGlowing = false;
 
 if (rand < 0.2) {
 powerUpType = 'doubleJump';
-isGlowing = Math.random() < 0.1;
+isGlowing = Math.random() < (0.1 + hpGlowChanceBonus + doubleJumpGlowChanceBonus);
 } else if (rand < 0.4) {
 powerUpType = 'invincibility';
-isGlowing = Math.random() < 0.05;
+isGlowing = Math.random() < (0.05 + hpGlowChanceBonus + invincibilityGlowChanceBonus); 
 } else if (rand < 0.8) {
-powerUpType = 'hpBoost';
-isGlowing = Math.random() < 0.05;
+powerUpType = 'hpBoost'; 
+isGlowing = Math.random() < (0.05 + hpGlowChanceBonus); 
 } else if (rand < 0.805) {
-powerUpType = 'flight';
-isGlowing = Math.random() < 0.25;
+powerUpType = 'flight'; 
+isGlowing = Math.random() < (0.25 + flightGlowChanceBonus); 
 } else {
 powerUpType = 'hpBoost';
-isGlowing = Math.random() < 0.05;
-}
+isGlowing = Math.random() < (0.05 + hpGlowChanceBonus); 
+} 
 
 powerUps.push(new PowerUp(x + platformWidth / 2 - 12.5, rowY - 30, powerUpType, isGlowing));
 }
 
-if (coinCollectiblePurchased && Math.random() < 0.015 * coinSpawnMultiplier && !powerUpOnPlatform(x, rowY)) {
+if (coinCollectiblePurchased && Math.random() < 0.015 * coinSpawnMultiplier && !powerUpOnPlatform(x, rowY)) { 
 let safeDistance = 50;
 let collectibleX = x + safeDistance + (Math.random() * (platformWidth - 2 * safeDistance));
-let collectibleY = rowY - 45;
+let collectibleY = rowY - 45; 
 let isGlowing = glowingCoinChancePurchased && Math.random() < 0.3;
 coinCollectibles.push(new CoinCollectible(collectibleX, collectibleY, isGlowing));
 }
@@ -1137,38 +1450,38 @@ coinCollectibles.push(new CoinCollectible(collectibleX, collectibleY, isGlowing)
 }
 
 function shouldPlatformMove() {
-let baseChance = 0.25;
+let baseChance = 0.25; 
 let scoreThresholds = [1000, 3000, 6000, 10000];
 let reductionFactors = [0.75, 0.65, 0.6, 0.55, 0.5, 0.4];
-let index = 0;
+let index = 0; 
 
 while (index < scoreThresholds.length && score > scoreThresholds[index]) {
 index++;
-}
+} 
 
-let reduction = reductionFactors[index] || reductionFactors[reductionFactors.length - 1];
-return Math.random() < baseChance * (1 - reduction);
+let reduction = reductionFactors[index] || reductionFactors[reductionFactors.length - 1]; 
+return Math.random() < baseChance * (1 - reduction); 
 }
 
 function generateObstaclesRow(yPosition) {
-let obstacleCount = 1;
+let obstacleCount = 1; 
 
-for (let i = 0; i < obstacleCount; i++) {
-let width = 40;
-let height = 40;
-let x = Math.random() * (GAME_WIDTH - width);
+for (let i = 0; i < obstacleCount; i++) { 
+let width = 40; 
+let height = 40; 
+let x = Math.random() * (GAME_WIDTH - width); 
 let y = yPosition;
 
 let isMoving = Math.random() < 0.5;
 let vx = isMoving ? (Math.random() - 0.5) * 4 : 0;
-let vy = 0;
+let vy = 0; 
 
-obstacles.push(new Obstacle(x, y, width, height, '#8B0000', vx, vy));
-}
+obstacles.push(new Obstacle(x, y, width, height, '#8B0000', vx, vy)); 
+} 
 }
 
-function spawnFlightObstacles() {
-flightObstacles = [];
+function spawnFlightObstacles() { 
+flightObstacles = []; 
 let spawnRate = 500 / 8;
 let flightEndTime = Date.now() + activePowerUps['flight'].remainingTime;
 
@@ -1177,125 +1490,114 @@ function spawnObstacle() {
 }
 
 let obstacleSpawner = setInterval(() => {
-if (Date.now() > flightEndTime) {
+if (Date.now() > flightEndTime) { 
 clearInterval(obstacleSpawner);
-flightObstacles = [];
-} else {
-spawnObstacle();
-}
-}, spawnRate);
+flightObstacles = []; 
+} else { 
+spawnObstacle(); 
+} 
+}, spawnRate); 
 }
 
-function updatePowerUpDisplay() {
-let texts = [];
+function updatePowerUpDisplay() { 
+let texts = []; 
 for (let [type, powerUpData] of Object.entries(activePowerUps)) {
 let remaining = Math.ceil(powerUpData.remainingTime / 1000);
-let name = '';
+let name = ''; 
 if (type === 'doubleJump') name = 'Double Jump';
-else if (type === 'invincibility') name = 'Invincibility';
-else if (type === 'flight') name = 'Flight';
-else if (type === 'owie') name = 'OWIE!';
-else if (type === 'trueFlight') name = 'True Flight';
+else if (type === 'invincibility') name = 'Invincibility'; 
+else if (type === 'flight') name = 'Flight'; 
+else if (type === 'owie') name = 'OWIE!'; 
+else if (type === 'trueFlight') name = 'True Flight'; 
 else if (type === 'trueInvincibility') name = 'True Invincibility';
-else if (type === 'timeStop') name = 'Time Stop';
-texts.push(`${name}: ${remaining}s`);
+else if (type === 'timeStop') name = 'Time Stop'; 
+texts.push(`${name}: ${remaining}s`); 
 }
-powerUpDisplay.innerText = texts.join('\n');
+powerUpDisplay.innerText = texts.join('\n'); 
 }
 
 function applyTimeStopEffect() {
-if (timeStopActive) {
+if (timeStopActive) { 
 ctx.save();
 ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
 ctx.globalCompositeOperation = 'saturation';
-ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT); 
 ctx.restore();
-}
-}
+} 
+} 
 
-function updateCoins(earnedCoins) {
+function updateCoins(earnedCoins) { 
 if (earnedCoins > 0) {
-coins += earnedCoins;
+coins += earnedCoins; 
 localStorage.setItem('coins', coins);
-updateCoinDisplay();
-updateShopCoinDisplay();
+updateCoinDisplay(); 
+updateShopCoinDisplay(); 
 }
-}
+} 
 
 function updateCoinDisplay() {
 const coinCount = document.getElementById('coinCount');
 if (coinCount) {
 coinCount.innerText = coins;
-}
-if (player) {
-scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${player.hp}/${player.maxHP}`;
+} 
+if (player) { 
+scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${player.hp}/${player.maxHP}`; 
 }
 }
 
 function updateShopCoinDisplay() {
 const shopCoinDisplay = document.getElementById('shopCoinCount');
-if (shopCoinDisplay) {
+if (shopCoinDisplay) { 
 shopCoinDisplay.innerText = coins;
-}
-}
+} 
+} 
 
-function startGame() {
-startMenu.style.display = 'none';
-shopMenu.style.display = 'none';
+function startGame() { 
+startMenu.style.display = 'none'; 
+shopMenu.style.display = 'none'; 
 infoMenu.style.display = 'none';
 initializeGame();
-gameLoop();
-}
+gameLoop(); 
+} 
 
-function showInfoMenu() {
+function showInfoMenu() { 
 startMenu.style.display = 'none';
-shopMenu.style.display = 'none';
+shopMenu.style.display = 'none'; 
 infoMenu.style.display = 'flex';
 }
 
-function showShopMenu() {
-startMenu.style.display = 'none';
-infoMenu.style.display = 'none';
-shopMenu.style.display = 'flex';
+function showShopMenu() { 
+startMenu.style.display = 'none'; 
+infoMenu.style.display = 'none'; 
+shopMenu.style.display = 'flex'; 
 updateShopCoinDisplay();
-updateShopButtonState();
-sortShopItems();
-}
-
-function sortShopItems() {
-const shopItems = Array.from(document.querySelectorAll('#shopMenu .shop-item'));
-
-shopItems.sort((a, b) => {
-const costA = parseInt(a.getAttribute('data-cost'));
-const costB = parseInt(b.getAttribute('data-cost'));
-return costA - costB;
-});
-
-const shopMenuDiv = document.getElementById('shopMenu');
-shopItems.forEach(item => shopMenuDiv.appendChild(item));
-}
+updateShopButtonState(); 
+} 
 
 function showStartMenu() {
-infoMenu.style.display = 'none';
-shopMenu.style.display = 'none';
-gameOverScreen.style.display = 'none';
-modal.style.display = 'none';
-startMenu.style.display = 'flex';
+infoMenu.style.display = 'none'; 
+shopMenu.style.display = 'none'; 
+gameOverScreen.style.display = 'none'; 
+modal.style.display = 'none'; 
+startMenu.style.display = 'flex'; 
 updateCoinDisplay();
 }
 
 function powerUpOnPlatform(platformX, platformY) {
 for (let powerUp of powerUps) {
 if (
-powerUp.x > platformX &&
+powerUp.x > platformX && 
 powerUp.x + powerUp.size < platformX + 100 &&
-powerUp.y === platformY - 30
-) {
-return true;
+powerUp.y === platformY - 30 
+) { 
+return true; 
+} 
 }
+return false; 
 }
-return false;
-}
+
+let diedToExplosion = false; 
+let lastRegenTime = 0; 
 
 function initializeGame() {
 score = 0;
@@ -1309,438 +1611,751 @@ groundY = GAME_HEIGHT - 20;
 scoreBaseY = groundY;
 activePowerUps = {};
 floorHitCost = 5;
-timeStopActive = false;
+timeStopActive = false; 
 lastUpdateTime = Date.now();
-player = new Player(spawningHPBonus);
+player = new Player(spawningHPBonus, maxHPBonus);
 generateInitialPlatforms();
 obstacles = [];
 powerUps = [];
 coinCollectibles = [];
-flightObstacles = [];
+flightObstacles = []; 
 cameraOffsetY = player.y - GAME_HEIGHT / 2;
 cameraTargetY = cameraOffsetY;
-lastPlatformY = groundY - 100;
-nextCoinScore = 1000; // Reset coin threshold
-powerupTimerBonus = parseInt(localStorage.getItem('powerupTimerBonus')) || 0;
-spawningHPBonus = parseInt(localStorage.getItem('spawningHPBonus')) || 0;
-coinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true';
-glowingCoinChancePurchased = localStorage.getItem('glowingCoinChancePurchased') === 'true';
-doubleCoinSpawnPurchased = localStorage.getItem('doubleCoinSpawnPurchased') === 'true';
-coinSpawnMultiplier = doubleCoinSpawnPurchased ? 2 : 1;
-betterInvincibilityPurchased = localStorage.getItem('betterInvincibilityPurchased') === 'true';
-invincibilityHitBonus = betterInvincibilityPurchased ? 1 : 0;
-updateShopButtonState();
-showItemsBasedOnPurchases();
-}
+lastPlatformY = groundY - 100; 
+nextCoinScore = 1000;
+diedToExplosion = false; 
+holdingE = false;
+explosionStartTime = 0; 
+lastRegenTime = Date.now(); 
+explosionParticles = [];
+
+loadPurchaseStates();
+updateShopButtonState(); 
+} 
 
 function restartGame() {
 gameOverScreen.style.display = 'none';
 initializeGame();
-gameLoop();
-}
+gameLoop(); 
+} 
 
 function purchasePowerupTimer() {
-const cost = 125;
-const powerupTimerItem = document.getElementById('powerupTimerItem');
-if (powerupTimerItem.classList.contains('locked')) {
-showPurchaseMessage('Item is locked', false);
-return; // Exit the function if the item is locked
-}
-
-if (coins >= cost) {
+const cost = 125; 
+if (coins >= cost) { 
 coins -= cost;
 localStorage.setItem('coins', coins);
 updateCoinDisplay();
 updateShopCoinDisplay();
 
-localStorage.setItem('morePowerupTimerPurchased', 'true');
-powerupTimerBonus += 1;
+localStorage.setItem('morePowerupTimerPurchased', 'true'); 
+powerupTimerPurchased = true;
+powerupTimerBonus += 1; 
 localStorage.setItem('powerupTimerBonus', powerupTimerBonus);
 
 for (let [type, powerUpData] of Object.entries(activePowerUps)) {
 if (type !== 'owie') {
 powerUpData.remainingTime += 5000;
-}
-}
-
-const buyButton = document.getElementById('buyPowerupTimerBtn');
-if (buyButton) {
-buyButton.innerText = 'Purchased';
-buyButton.disabled = true;
-buyButton.style.backgroundColor = '#808080';
-buyButton.style.cursor = 'not-allowed';
+} 
 }
 
-showPurchaseMessage('Bought Extra Timer');
+updateShopItemButton('buyPowerupTimerBtn', true);
+
+showPurchaseMessage('Bought Extra Timer'); 
 } else {
-showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
-}
+showPurchaseMessage('Not enough coins', false); 
+} 
 }
 
 function purchaseSpawningHP() {
-const cost = 25;
-const spawningHPItem = document.getElementById('spawningHPItem'); 
-if (spawningHPItem.classList.contains('locked')) {
-showPurchaseMessage('Item is locked', false);
-return; // Exit the function if the item is locked
-}
-
-if (coins >= cost) {
+const cost = 25; 
+if (coins >= cost) { 
 coins -= cost;
 localStorage.setItem('coins', coins);
 updateCoinDisplay();
 updateShopCoinDisplay();
 localStorage.setItem('spawningHPPurchased', 'true');
+spawningHPPurchased = true;
 
 spawningHPBonus += 2;
 localStorage.setItem('spawningHPBonus', spawningHPBonus);
 
-const buyButton = document.getElementById('buySpawningHPBtn');
-if (buyButton) {
-buyButton.innerText = 'Purchased';
-buyButton.disabled = true;
-buyButton.style.backgroundColor = '#808080';
-buyButton.style.cursor = 'not-allowed';
-}
+updateShopItemButton('buySpawningHPBtn', true); 
 
-showPurchaseMessage('Bought +2 Spawning HP');
-
-showItemsBasedOnPurchases();
+showPurchaseMessage('Bought +2 Spawning HP'); 
 } else {
-showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
-}
+showPurchaseMessage('Not enough coins', false);
+} 
 }
 
 function purchaseCoinCollectible() {
-const cost = 30;
-const coinCollectibleItem = document.getElementById('coinCollectibleItem');
-if (coinCollectibleItem.classList.contains('locked')) {
-showPurchaseMessage('Item is locked', false);
-return; // Exit the function if the item is locked
-}
-
-if (coins >= cost) {
+const cost = 30; 
+if (coins >= cost) { 
 coins -= cost;
 localStorage.setItem('coins', coins);
-updateCoinDisplay();
-updateShopCoinDisplay();
+updateCoinDisplay(); 
+updateShopCoinDisplay(); 
 localStorage.setItem('coinCollectiblePurchased', 'true');
-coinCollectiblePurchased = true;
+coinCollectiblePurchased = true; 
 
-const buyButton = document.getElementById('buyCoinCollectibleBtn');
-if (buyButton) {
-buyButton.innerText = 'Purchased';
-buyButton.disabled = true;
-buyButton.style.backgroundColor = '#808080';
-buyButton.style.cursor = 'not-allowed';
+updateShopItemButton('buyCoinCollectibleBtn', true); 
+
+showPurchaseMessage('Bought Coin Collectible'); 
+} else { 
+showPurchaseMessage('Not enough coins', false); 
+} 
 }
 
-showPurchaseMessage('Bought Coin Collectible');
-showItemsBasedOnPurchases();
-} else {
-showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
-}
-}
-
-function purchaseBetterInvincibility() {
-const cost = 50;
-const betterInvincibilityItem = document.getElementById('betterInvincibilityItem'); 
-if (betterInvincibilityItem.classList.contains('locked')) {
-showPurchaseMessage('Item is locked', false);
-return; // Exit the function if the item is locked
-}
-
-if (coins >= cost) {
+function purchaseBetterInvincibility() { 
+const cost = 50; 
+if (coins >= cost) { 
 coins -= cost;
-localStorage.setItem('coins', coins);
-updateCoinDisplay();
-updateShopCoinDisplay();
+localStorage.setItem('coins', coins); 
+updateCoinDisplay(); 
+updateShopCoinDisplay(); 
 
 localStorage.setItem('betterInvincibilityPurchased', 'true');
-betterInvincibilityPurchased = true;
-invincibilityHitBonus = 1;
+betterInvincibilityPurchased = true; 
+invincibilityHitBonus = 1; 
 
-const buyButton = document.getElementById('buyBetterInvincibilityBtn');
-if (buyButton) {
-buyButton.innerText = 'Purchased';
-buyButton.disabled = true;
-buyButton.style.backgroundColor = '#808080';
-buyButton.style.cursor = 'not-allowed';
-}
+updateShopItemButton('buyBetterInvincibilityBtn', true);
 
 showPurchaseMessage('Bought Better Invincibility!');
 } else {
-showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
+showPurchaseMessage('Not enough coins', false); 
 }
 }
 
-function purchaseDoubleCoinSpawn() {
-const cost = 75;
-const doubleCoinSpawnItem = document.getElementById('doubleCoinSpawnItem'); 
-if (doubleCoinSpawnItem.classList.contains('locked')) {
-showPurchaseMessage('Item is locked', false);
-return; // Exit the function if the item is locked
-}
-
+function purchaseDoubleCoinSpawn() { 
+const cost = 75; 
 if (coins >= cost) {
 coins -= cost;
-localStorage.setItem('coins', coins);
+localStorage.setItem('coins', coins); 
 updateCoinDisplay();
 updateShopCoinDisplay();
 
-localStorage.setItem('doubleCoinSpawnPurchased', 'true');
-doubleCoinSpawnPurchased = true;
-coinSpawnMultiplier = 2;
+localStorage.setItem('doubleCoinSpawnPurchased', 'true'); 
+doubleCoinSpawnPurchased = true; 
+coinSpawnMultiplier = 2; 
 
-const buyButton = document.getElementById('buyDoubleCoinSpawnBtn');
-if (buyButton) {
-buyButton.innerText = 'Purchased';
-buyButton.disabled = true;
-buyButton.style.backgroundColor = '#808080';
-buyButton.style.cursor = 'not-allowed';
-}
+updateShopItemButton('buyDoubleCoinSpawnBtn', true); 
 
 showPurchaseMessage('Bought 2x Coin Collectible Spawn!');
 } else {
-showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
-}
+showPurchaseMessage('Not enough coins', false);
+} 
 }
 
-function purchaseGlowingCoinChance() {
+function purchaseGlowingCoinChance() { 
 const cost = 250;
-const glowingCoinChanceItem = document.getElementById('glowingCoinChanceItem'); 
-if (glowingCoinChanceItem.classList.contains('locked')) {
-showPurchaseMessage('Item is locked', false);
-return; // Exit the function if the item is locked
-}
-
-if (coins >= cost) {
+if (coins >= cost) { 
 coins -= cost;
 localStorage.setItem('coins', coins);
-updateCoinDisplay();
-updateShopCoinDisplay();
+updateCoinDisplay(); 
+updateShopCoinDisplay(); 
 
-localStorage.setItem('glowingCoinChancePurchased', 'true');
-glowingCoinChancePurchased = true;
+localStorage.setItem('glowingCoinChancePurchased', 'true'); 
+glowingCoinChancePurchased = true; 
 
-const buyButton = document.getElementById('buyGlowingCoinChanceBtn');
-if (buyButton) {
-buyButton.innerText = 'Purchased';
-buyButton.disabled = true;
-buyButton.style.backgroundColor = '#808080';
-buyButton.style.cursor = 'not-allowed';
-}
+updateShopItemButton('buyGlowingCoinChanceBtn', true); 
 
-showPurchaseMessage('Bought Glowing Coin Chance!');
+showPurchaseMessage('Bought Glowing Coin Chance!'); 
 } else {
-showPurchaseMessage('Not enough coins', false); // Red message for insufficient coins
+showPurchaseMessage('Not enough coins', false);
+} 
+}
+
+function purchaseZFlight() {
+const cost = 500;
+if (coins >= cost) {
+coins -= cost; 
+localStorage.setItem('coins', coins); 
+updateCoinDisplay();
+updateShopCoinDisplay(); 
+localStorage.setItem('zFlightPurchased', 'true');
+zFlightPurchased = true; 
+
+updateShopItemButton('buyZFlightBtn', true); 
+
+showPurchaseMessage('Bought Z Flight Ability!'); 
+} else { 
+showPurchaseMessage('Not enough coins', false);
+}
+} 
+
+function purchaseExplosionAbility() {
+const cost = 150; 
+if (coins >= cost) { 
+coins -= cost; 
+localStorage.setItem('coins', coins); 
+updateCoinDisplay();
+updateShopCoinDisplay(); 
+localStorage.setItem('explosionAbilityPurchased', 'true'); 
+explosionAbilityPurchased = true;
+
+updateShopItemButton('buyExplosionAbilityBtn', true); 
+
+showPurchaseMessage('Bought Explosion Ability!'); 
+} else {
+showPurchaseMessage('Not enough coins', false);
 }
 }
 
-function updateShopButtonState() {
+function purchaseNaturalRegen() {
+const cost = 150;
+if (coins >= cost) { 
+coins -= cost; 
+localStorage.setItem('coins', coins); 
+updateCoinDisplay(); 
+updateShopCoinDisplay(); 
+localStorage.setItem('naturalRegenPurchased', 'true'); 
+naturalRegenPurchased = true;
+
+updateShopItemButton('buyNaturalRegenBtn', true); 
+
+showPurchaseMessage('Bought Natural Regeneration!'); 
+} else { 
+showPurchaseMessage('Not enough coins', false);
+}
+} 
+
+function purchaseHpGlowChance() {
+const cost = 200; 
+if (coins >= cost) { 
+coins -= cost;
+localStorage.setItem('coins', coins);
+updateCoinDisplay(); 
+updateShopCoinDisplay();
+localStorage.setItem('hpGlowChancePurchased', 'true');
+hpGlowChancePurchased = true; 
+
+hpGlowChanceBonus += 0.1;
+
+updateShopItemButton('buyHpGlowChanceBtn', true); 
+
+showPurchaseMessage('Bought +10% HP Glow Chance!'); 
+} else {
+showPurchaseMessage('Not enough coins', false); 
+} 
+}
+
+function purchaseMaxHP() { 
+    const cost = 100; 
+    if (coins >= cost) { 
+        coins -= cost;
+        localStorage.setItem('coins', coins); 
+        updateCoinDisplay(); 
+        updateShopCoinDisplay(); 
+
+        localStorage.setItem('maxHPPurchased', 'true');
+        maxHPPurchased = true; 
+
+        maxHPBonus += 10; 
+        localStorage.setItem('maxHPBonus', maxHPBonus); 
+
+        // If the player exists, update their maxHP immediately
+        if (player) {
+            player.maxHP += 10;
+            player.hp = Math.min(player.hp, player.maxHP); 
+        } 
+
+        updateShopItemButton('buyMaxHPBtn', true); 
+
+        showPurchaseMessage('Bought +10 Max HP!'); 
+    } else {
+        showPurchaseMessage('Not enough coins', false);
+    }
+}
+
+function purchaseHigherFlightGlowChance() {
+    const cost = 300;
+    if (coins >= cost) {
+        coins -= cost;
+        localStorage.setItem('coins', coins);
+        updateCoinDisplay();
+        updateShopCoinDisplay();
+
+        localStorage.setItem('higherFlightGlowChancePurchased', 'true');
+        higherFlightGlowChancePurchased = true; 
+
+        flightGlowChanceBonus += 0.07;
+
+        updateShopItemButton('buyHigherFlightGlowChanceBtn', true);
+
+        showPurchaseMessage('Bought Higher Flight Glow Chance!'); 
+    } else {
+        showPurchaseMessage('Not enough coins', false); 
+    } 
+} 
+
+function purchaseHigherDoubleJumpGlowChance() { 
+    const cost = 600; 
+    if (coins >= cost) { 
+        coins -= cost;
+        localStorage.setItem('coins', coins); 
+        updateCoinDisplay(); 
+        updateShopCoinDisplay();
+
+        localStorage.setItem('higherDoubleJumpGlowChancePurchased', 'true'); 
+        higherDoubleJumpGlowChancePurchased = true;
+
+        doubleJumpGlowChanceBonus += 0.10;
+
+        updateShopItemButton('buyHigherDoubleJumpGlowChanceBtn', true);
+
+        showPurchaseMessage('Bought Higher Double Jump Glow Chance!'); 
+    } else { 
+        showPurchaseMessage('Not enough coins', false); 
+    } 
+} 
+
+function purchaseHigherInvincibilityGlowChance() { 
+    const cost = 700; 
+    if (coins >= cost) { 
+        coins -= cost;
+        localStorage.setItem('coins', coins); 
+        updateCoinDisplay(); 
+        updateShopCoinDisplay(); 
+
+        localStorage.setItem('higherInvincibilityGlowChancePurchased', 'true'); 
+        higherInvincibilityGlowChancePurchased = true; 
+
+        invincibilityGlowChanceBonus += 0.05; 
+
+        updateShopItemButton('buyHigherInvincibilityGlowChanceBtn', true); 
+
+        showPurchaseMessage('Bought Higher Invincibility Glow Chance!'); 
+    } else { 
+        showPurchaseMessage('Not enough coins', false); 
+    } 
+}
+
+function toggleZFlight() { 
+if (zFlightActive) { 
+clearInterval(zFlightHpInterval);
+zFlightActive = false;
+player.canTrueFly = false; 
+showPurchaseMessage('Flight Disabled'); 
+
+// Re-enable red powerups when Z Flight is deactivated
+powerUps.forEach(powerUp => {
+if (powerUp.originalColor === '#FF0000') { 
+powerUp.color = powerUp.originalColor; 
+} 
+}); 
+
+} else { 
+if (player.hp >= 4) {
+player.hp -= 4; 
+zFlightActive = true; 
+player.canTrueFly = true;
+zFlightHpInterval = setInterval(() => {
+if (player.hp > 2) {
+player.hp -= 2;
+scoreBoard.innerText = `Score: ${score} | Coins: ${coins} | HP: ${player.hp}/${player.maxHP}`;
+} else { 
+clearInterval(zFlightHpInterval);
+zFlightActive = false; 
+player.canTrueFly = false; 
+showPurchaseMessage('Not enough HP - Flight Disabled!', false);
+if (player.hp <= 0) {
+gameOver = true;
+
+// Calculate High Score Bonus 
+let highScoreBonus = Math.floor(score / 25000) * 10;
+
+finalScoreDisplay.innerText = score;
+highScoreBonusDisplay.innerText = highScoreBonus; 
+let totalBonusCoins = highScoreBonus; 
+
+// Calculate Explosion Bonus Coins 
+let explosionBonusCoins = 0; 
+if (diedToExplosion) { 
+explosionBonusCoins = Math.floor(score / 5000); 
+explosionBonusCoinsDisplay.innerText = explosionBonusCoins; 
+totalBonusCoins += explosionBonusCoins; 
+} 
+
+updateCoins(totalBonusCoins); 
+
+if (score > highScore) {
+highScore = score;
+localStorage.setItem('highScore', highScore); 
+} 
+highScoreDisplay.innerText = highScore; 
+gameOverScreen.style.display = 'flex';
+} 
+} 
+}, 1000); 
+showPurchaseMessage('Flight Enabled');
+
+// Turn red powerups grey when Z Flight is activated 
+powerUps.forEach(powerUp => {
+if (powerUp.originalColor === '#FF0000') {
+powerUp.color = '#808080'; 
+}
+}); 
+
+} else {
+showPurchaseMessage('Not enough HP to activate!', false);
+}
+}
+}
+
+// Load purchase states from localStorage AND update shop buttons
+function loadPurchaseStates() { 
+coinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true'; 
+updateShopItemButton('buyCoinCollectibleBtn', coinCollectiblePurchased);
+
+glowingCoinChancePurchased = localStorage.getItem('glowingCoinChancePurchased') === 'true'; 
+updateShopItemButton('buyGlowingCoinChanceBtn', glowingCoinChancePurchased);
+
+doubleCoinSpawnPurchased = localStorage.getItem('doubleCoinSpawnPurchased') === 'true';
+coinSpawnMultiplier = doubleCoinSpawnPurchased ? 2 : 1; 
+updateShopItemButton('buyDoubleCoinSpawnBtn', doubleCoinSpawnPurchased);
+
+powerupTimerPurchased = localStorage.getItem('morePowerupTimerPurchased') === 'true'; 
+powerupTimerBonus = parseInt(localStorage.getItem('powerupTimerBonus')) || 0; 
+updateShopItemButton('buyPowerupTimerBtn', powerupTimerPurchased); 
+
+spawningHPPurchased = localStorage.getItem('spawningHPPurchased') === 'true';
+spawningHPBonus = parseInt(localStorage.getItem('spawningHPBonus')) || 0; 
+updateShopItemButton('buySpawningHPBtn', spawningHPPurchased); 
+
+betterInvincibilityPurchased = localStorage.getItem('betterInvincibilityPurchased') === 'true';
+invincibilityHitBonus = betterInvincibilityPurchased ? 1 : 0; 
+updateShopItemButton('buyBetterInvincibilityBtn', betterInvincibilityPurchased);
+
+zFlightPurchased = localStorage.getItem('zFlightPurchased') === 'true';
+updateShopItemButton('buyZFlightBtn', zFlightPurchased); 
+
+explosionAbilityPurchased = localStorage.getItem('explosionAbilityPurchased') === 'true'; 
+updateShopItemButton('buyExplosionAbilityBtn', explosionAbilityPurchased); 
+
+naturalRegenPurchased = localStorage.getItem('naturalRegenPurchased') === 'true'; 
+updateShopItemButton('buyNaturalRegenBtn', naturalRegenPurchased); 
+
+hpGlowChancePurchased = localStorage.getItem('hpGlowChancePurchased') === 'true'; 
+hpGlowChanceBonus = hpGlowChancePurchased ? 0.1 : 0; 
+updateShopItemButton('buyHpGlowChanceBtn', hpGlowChancePurchased); 
+
+maxHPPurchased = localStorage.getItem('maxHPPurchased') === 'true';
+maxHPBonus = parseInt(localStorage.getItem('maxHPBonus')) || 0;
+updateShopItemButton('buyMaxHPBtn', maxHPPurchased); 
+
+higherFlightGlowChancePurchased = localStorage.getItem('higherFlightGlowChancePurchased') === 'true'; 
+flightGlowChanceBonus = higherFlightGlowChancePurchased ? 0.07 : 0;
+updateShopItemButton('buyHigherFlightGlowChanceBtn', higherFlightGlowChancePurchased); 
+
+higherDoubleJumpGlowChancePurchased = localStorage.getItem('higherDoubleJumpGlowChancePurchased') === 'true'; 
+doubleJumpGlowChanceBonus = higherDoubleJumpGlowChancePurchased ? 0.1 : 0; 
+updateShopItemButton('buyHigherDoubleJumpGlowChanceBtn', higherDoubleJumpGlowChancePurchased); 
+
+higherInvincibilityGlowChancePurchased = localStorage.getItem('higherInvincibilityGlowChancePurchased') === 'true'; 
+invincibilityGlowChanceBonus = higherInvincibilityGlowChancePurchased ? 0.05 : 0;
+updateShopItemButton('buyHigherInvincibilityGlowChanceBtn', higherInvincibilityGlowChancePurchased);
+} 
+
+function updateShopButtonState() { 
 const buyPowerupTimerBtn = document.getElementById('buyPowerupTimerBtn');
-const isPowerupTimerPurchased = localStorage.getItem('morePowerupTimerPurchased') === 'true';
 
-if (buyPowerupTimerBtn) {
-if (isPowerupTimerPurchased) {
+if (buyPowerupTimerBtn) { 
+if (powerupTimerPurchased) { 
 buyPowerupTimerBtn.innerText = 'Purchased';
-buyPowerupTimerBtn.disabled = true;
+buyPowerupTimerBtn.disabled = true; 
 buyPowerupTimerBtn.style.backgroundColor = '#808080';
-buyPowerupTimerBtn.style.cursor = 'not-allowed';
+buyPowerupTimerBtn.style.cursor = 'not-allowed'; 
 } else {
 buyPowerupTimerBtn.innerText = 'Buy (125 Coins)';
-buyPowerupTimerBtn.disabled = false;
+buyPowerupTimerBtn.disabled = false; 
 buyPowerupTimerBtn.style.backgroundColor = '#FFD700';
-buyPowerupTimerBtn.style.cursor = 'pointer';
-}
+buyPowerupTimerBtn.style.cursor = 'pointer'; 
+} 
 }
 
-const buySpawningHPBtn = document.getElementById('buySpawningHPBtn');
-const isSpawningHPPurchased = localStorage.getItem('spawningHPPurchased') === 'true';
+const buySpawningHPBtn = document.getElementById('buySpawningHPBtn'); 
 
 if (buySpawningHPBtn) {
-if (isSpawningHPPurchased) {
+if (spawningHPPurchased) { 
 buySpawningHPBtn.innerText = 'Purchased';
-buySpawningHPBtn.disabled = true;
-buySpawningHPBtn.style.backgroundColor = '#808080';
-buySpawningHPBtn.style.cursor = 'not-allowed';
-} else {
-buySpawningHPBtn.innerText = 'Buy (25 Coins)';
+buySpawningHPBtn.disabled = true; 
+buySpawningHPBtn.style.backgroundColor = '#808080'; 
+buySpawningHPBtn.style.cursor = 'not-allowed'; 
+} else { 
+buySpawningHPBtn.innerText = 'Buy (25 Coins)'; 
 buySpawningHPBtn.disabled = false;
-buySpawningHPBtn.style.backgroundColor = '#FFD700';
+buySpawningHPBtn.style.backgroundColor = '#FFD700'; 
 buySpawningHPBtn.style.cursor = 'pointer';
-}
+} 
 }
 
-const buyCoinCollectibleBtn = document.getElementById('buyCoinCollectibleBtn');
-const isCoinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true';
+const buyCoinCollectibleBtn = document.getElementById('buyCoinCollectibleBtn'); 
 
-if (buyCoinCollectibleBtn) {
-if (isCoinCollectiblePurchased) {
+if (buyCoinCollectibleBtn) { 
+if (coinCollectiblePurchased) { 
 buyCoinCollectibleBtn.innerText = 'Purchased';
-buyCoinCollectibleBtn.disabled = true;
+buyCoinCollectibleBtn.disabled = true; 
 buyCoinCollectibleBtn.style.backgroundColor = '#808080';
 buyCoinCollectibleBtn.style.cursor = 'not-allowed';
-} else {
-buyCoinCollectibleBtn.innerText = 'Buy (30 Coins)';
+} else { 
+buyCoinCollectibleBtn.innerText = 'Buy (30 Coins)'; 
 buyCoinCollectibleBtn.disabled = false;
 buyCoinCollectibleBtn.style.backgroundColor = '#FFD700';
 buyCoinCollectibleBtn.style.cursor = 'pointer';
 }
-}
+} 
 
 const buyGlowingCoinChanceBtn = document.getElementById('buyGlowingCoinChanceBtn');
-const isGlowingCoinChancePurchased = localStorage.getItem('glowingCoinChancePurchased') === 'true';
 
-if (buyGlowingCoinChanceBtn) {
-if (isGlowingCoinChancePurchased) {
-buyGlowingCoinChanceBtn.innerText = 'Purchased';
-buyGlowingCoinChanceBtn.disabled = true;
-buyGlowingCoinChanceBtn.style.backgroundColor = '#808080';
-buyGlowingCoinChanceBtn.style.cursor = 'not-allowed';
-} else {
+if (buyGlowingCoinChanceBtn) { 
+if (glowingCoinChancePurchased) { 
+buyGlowingCoinChanceBtn.innerText = 'Purchased'; 
+buyGlowingCoinChanceBtn.disabled = true; 
+buyGlowingCoinChanceBtn.style.backgroundColor = '#808080'; 
+buyGlowingCoinChanceBtn.style.cursor = 'not-allowed'; 
+} else { 
 buyGlowingCoinChanceBtn.innerText = 'Buy (250 Coins)';
 buyGlowingCoinChanceBtn.disabled = false;
 buyGlowingCoinChanceBtn.style.backgroundColor = '#FFD700';
 buyGlowingCoinChanceBtn.style.cursor = 'pointer';
-}
+} 
 }
 
-const buyDoubleCoinSpawnBtn = document.getElementById('buyDoubleCoinSpawnBtn');
-const isDoubleCoinSpawnPurchased = localStorage.getItem('doubleCoinSpawnPurchased') === 'true';
+const buyDoubleCoinSpawnBtn = document.getElementById('buyDoubleCoinSpawnBtn'); 
 
-if (buyDoubleCoinSpawnBtn) {
-if (isDoubleCoinSpawnPurchased) {
-buyDoubleCoinSpawnBtn.innerText = 'Purchased';
+if (buyDoubleCoinSpawnBtn) { 
+if (doubleCoinSpawnPurchased) { 
+buyDoubleCoinSpawnBtn.innerText = 'Purchased'; 
 buyDoubleCoinSpawnBtn.disabled = true;
-buyDoubleCoinSpawnBtn.style.backgroundColor = '#808080';
-buyDoubleCoinSpawnBtn.style.cursor = 'not-allowed';
-} else {
+buyDoubleCoinSpawnBtn.style.backgroundColor = '#808080'; 
+buyDoubleCoinSpawnBtn.style.cursor = 'not-allowed'; 
+} else { 
 buyDoubleCoinSpawnBtn.innerText = 'Buy (75 Coins)';
 buyDoubleCoinSpawnBtn.disabled = false;
 buyDoubleCoinSpawnBtn.style.backgroundColor = '#FFD700';
 buyDoubleCoinSpawnBtn.style.cursor = 'pointer';
-}
+} 
 }
 
-const buyBetterInvincibilityBtn = document.getElementById('buyBetterInvincibilityBtn');
-const isBetterInvincibilityPurchased = localStorage.getItem('betterInvincibilityPurchased') === 'true';
+const buyBetterInvincibilityBtn = document.getElementById('buyBetterInvincibilityBtn'); 
 
-if (buyBetterInvincibilityBtn) {
-if (isBetterInvincibilityPurchased) {
-buyBetterInvincibilityBtn.innerText = 'Purchased';
-buyBetterInvincibilityBtn.disabled = true;
+if (buyBetterInvincibilityBtn) { 
+if (betterInvincibilityPurchased) {
+buyBetterInvincibilityBtn.innerText = 'Purchased'; 
+buyBetterInvincibilityBtn.disabled = true; 
 buyBetterInvincibilityBtn.style.backgroundColor = '#808080';
 buyBetterInvincibilityBtn.style.cursor = 'not-allowed';
+} else { 
+buyBetterInvincibilityBtn.innerText = 'Buy (50 Coins)'; 
+buyBetterInvincibilityBtn.disabled = false;
+buyBetterInvincibilityBtn.style.backgroundColor = '#FFD700'; 
+buyBetterInvincibilityBtn.style.cursor = 'pointer'; 
+}
+}
+
+const buyZFlightBtn = document.getElementById('buyZFlightBtn');
+
+if (buyZFlightBtn) { 
+if (zFlightPurchased) {
+buyZFlightBtn.innerText = 'Purchased'; 
+buyZFlightBtn.disabled = true; 
+buyZFlightBtn.style.backgroundColor = '#808080';
+buyZFlightBtn.style.cursor = 'not-allowed'; 
 } else {
-buyBetterInvincibilityBtn.innerText = 'Buy (50 Coins)';
-buyBetterInvincibilityBtn.disabled = false ;
-buyBetterInvincibilityBtn.style.backgroundColor = '#FFD700';
-buyBetterInvincibilityBtn.style.cursor = 'pointer';
+buyZFlightBtn.innerText = 'Buy (500 Coins)';
+buyZFlightBtn.disabled = false;
+buyZFlightBtn.style.backgroundColor = '#FFD700';
+buyZFlightBtn.style.cursor = 'pointer';
 }
+} 
+
+const buyExplosionAbilityBtn = document.getElementById('buyExplosionAbilityBtn');
+if (buyExplosionAbilityBtn) {
+if (explosionAbilityPurchased) {
+buyExplosionAbilityBtn.innerText = 'Purchased'; 
+buyExplosionAbilityBtn.disabled = true;
+buyExplosionAbilityBtn.style.backgroundColor = '#808080'; 
+buyExplosionAbilityBtn.style.cursor = 'not-allowed';
+} else { 
+buyExplosionAbilityBtn.innerText = 'Buy (150 Coins)';
+buyExplosionAbilityBtn.disabled = false;
+buyExplosionAbilityBtn.style.backgroundColor = '#FFD700'; 
+buyExplosionAbilityBtn.style.cursor = 'pointer'; 
 }
+} 
+
+const buyNaturalRegenBtn = document.getElementById('buyNaturalRegenBtn'); 
+if (buyNaturalRegenBtn) {
+if (naturalRegenPurchased) { 
+buyNaturalRegenBtn.innerText = 'Purchased';
+buyNaturalRegenBtn.disabled = true; 
+buyNaturalRegenBtn.style.backgroundColor = '#808080'; 
+buyNaturalRegenBtn.style.cursor = 'not-allowed';
+} else { 
+buyNaturalRegenBtn.innerText = 'Buy (150 Coins)'; 
+buyNaturalRegenBtn.disabled = false;
+buyNaturalRegenBtn.style.backgroundColor = '#FFD700';
+buyNaturalRegenBtn.style.cursor = 'pointer';
+} 
 }
 
-function showItemsBasedOnPurchases() {
-const spawningHPPurchased = localStorage.getItem('spawningHPPurchased') === 'true';
-const coinCollectiblePurchased = localStorage.getItem('coinCollectiblePurchased') === 'true';
-
-// Update lock status of Better Invincibility item
-const betterInvincibilityItem = document.getElementById('betterInvincibilityItem');
-if (spawningHPPurchased) {
-betterInvincibilityItem.classList.remove('locked');
+const buyHpGlowChanceBtn = document.getElementById('buyHpGlowChanceBtn'); 
+if (buyHpGlowChanceBtn) { 
+if (hpGlowChancePurchased) {
+buyHpGlowChanceBtn.innerText = 'Purchased'; 
+buyHpGlowChanceBtn.disabled = true;
+buyHpGlowChanceBtn.style.backgroundColor = '#808080'; 
+buyHpGlowChanceBtn.style.cursor = 'not-allowed'; 
 } else {
-betterInvincibilityItem.classList.add('locked');
+buyHpGlowChanceBtn.innerText = 'Buy (200 Coins)';
+buyHpGlowChanceBtn.disabled = false;
+buyHpGlowChanceBtn.style.backgroundColor = '#FFD700'; 
+buyHpGlowChanceBtn.style.cursor = 'pointer'; 
+} 
 }
 
-// Update lock status of coin-related items
-const doubleCoinSpawnItem = document.getElementById('doubleCoinSpawnItem');
-const powerupTimerItem = document.getElementById('powerupTimerItem');
-const glowingCoinChanceItem = document.getElementById('glowingCoinChanceItem');
+const buyMaxHPBtn = document.getElementById('buyMaxHPBtn'); 
+if (buyMaxHPBtn) { 
+if (maxHPPurchased) {
+buyMaxHPBtn.innerText = 'Purchased'; 
+buyMaxHPBtn.disabled = true; 
+buyMaxHPBtn.style.backgroundColor = '#808080';
+buyMaxHPBtn.style.cursor = 'not-allowed'; 
+} else { 
+buyMaxHPBtn.innerText = 'Buy (100 Coins)';
+buyMaxHPBtn.disabled = false;
+buyMaxHPBtn.style.backgroundColor = '#FFD700'; 
+buyMaxHPBtn.style.cursor = 'pointer'; 
+} 
+}
 
-if (coinCollectiblePurchased) {
-doubleCoinSpawnItem.classList.remove('locked');
-powerupTimerItem.classList.remove('locked');
-glowingCoinChanceItem.classList.remove('locked');
+const buyHigherFlightGlowChanceBtn = document.getElementById('buyHigherFlightGlowChanceBtn'); 
+if (buyHigherFlightGlowChanceBtn) { 
+if (higherFlightGlowChancePurchased) {
+buyHigherFlightGlowChanceBtn.innerText = 'Purchased';
+buyHigherFlightGlowChanceBtn.disabled = true;
+buyHigherFlightGlowChanceBtn.style.backgroundColor = '#808080'; 
+buyHigherFlightGlowChanceBtn.style.cursor = 'not-allowed'; 
 } else {
-doubleCoinSpawnItem.classList.add('locked');
-powerupTimerItem.classList.add('locked');
-glowingCoinChanceItem.classList.add('locked');
+buyHigherFlightGlowChanceBtn.innerText = 'Buy (300 Coins)'; 
+buyHigherFlightGlowChanceBtn.disabled = false;
+buyHigherFlightGlowChanceBtn.style.backgroundColor = '#FFD700'; 
+buyHigherFlightGlowChanceBtn.style.cursor = 'pointer'; 
+}
 }
 
-// Ensure initially visible items are unlocked and set to display: 'flex'
-document.getElementById('spawningHPItem').style.display = 'flex';
-document.getElementById('spawningHPItem').classList.remove('locked');
-document.getElementById('coinCollectibleItem').style.display = 'flex';
-document.getElementById('coinCollectibleItem').classList.remove('locked');
+const buyHigherDoubleJumpGlowChanceBtn = document.getElementById('buyHigherDoubleJumpGlowChanceBtn'); 
+if (buyHigherDoubleJumpGlowChanceBtn) { 
+if (higherDoubleJumpGlowChancePurchased) {
+buyHigherDoubleJumpGlowChanceBtn.innerText = 'Purchased'; 
+buyHigherDoubleJumpGlowChanceBtn.disabled = true;
+buyHigherDoubleJumpGlowChanceBtn.style.backgroundColor = '#808080';
+buyHigherDoubleJumpGlowChanceBtn.style.cursor = 'not-allowed';
+} else {
+buyHigherDoubleJumpGlowChanceBtn.innerText = 'Buy (600 Coins)'; 
+buyHigherDoubleJumpGlowChanceBtn.disabled = false;
+buyHigherDoubleJumpGlowChanceBtn.style.backgroundColor = '#FFD700'; 
+buyHigherDoubleJumpGlowChanceBtn.style.cursor = 'pointer'; 
+}
+} 
 
-// Sort shop items by cost
-sortShopItems();
+const buyHigherInvincibilityGlowChanceBtn = document.getElementById('buyHigherInvincibilityGlowChanceBtn');
+if (buyHigherInvincibilityGlowChanceBtn) { 
+if (higherInvincibilityGlowChancePurchased) {
+buyHigherInvincibilityGlowChanceBtn.innerText = 'Purchased';
+buyHigherInvincibilityGlowChanceBtn.disabled = true;
+buyHigherInvincibilityGlowChanceBtn.style.backgroundColor = '#808080';
+buyHigherInvincibilityGlowChanceBtn.style.cursor = 'not-allowed';
+} else { 
+buyHigherInvincibilityGlowChanceBtn.innerText = 'Buy (700 Coins)'; 
+buyHigherInvincibilityGlowChanceBtn.disabled = false; 
+buyHigherInvincibilityGlowChanceBtn.style.backgroundColor = '#FFD700'; 
+buyHigherInvincibilityGlowChanceBtn.style.cursor = 'pointer';
+}
+}
 }
 
-function showAlertModal(title, message) {
-modalTitle.innerText = title;
+function showAlertModal(title, message) { 
+modalTitle.innerText = title; 
 modalMessage.innerText = message;
 modal.style.display = 'flex';
 }
 
 function showConfirmationModal(title, message, onConfirm) {
-modalTitle.innerText = title;
+modalTitle.innerText = title; 
 modalMessage.innerText = message;
 
 modal.innerHTML = `
-
-<div id="modalContent">
+<div id="modalContent"> 
 <h2>${title}</h2>
-<p>${message}</p>
+<p>${message}</p> 
 <button onclick="handleConfirm()">Yes</button>
 <button onclick="closeModal()">No</button>
-</div>
-`;
+</div> 
+`; 
 window.handleConfirm = function() {
-onConfirm();
+onConfirm(); 
 closeModal();
 window.handleConfirm = null;
 };
 
-modal.style.display = 'flex';
+modal.style.display = 'flex'; 
 }
 
 function closeModal() {
-modal.style.display = 'none';
+modal.style.display = 'none'; 
 modal.innerHTML = `
-
-<div id="modalContent">
+<div id="modalContent"> 
 <h2 id="modalTitle">Title</h2>
 <p id="modalMessage">Message</p>
 <button onclick="closeModal()">OK</button>
-</div>
-`;
+</div> 
+`; 
 }
 
 function showPurchaseMessage(message, isSuccess = true) {
 purchaseMessage.innerText = message;
-purchaseMessage.style.backgroundColor = isSuccess ? 'black' : 'red'; // Set background color based on isSuccess
+purchaseMessage.style.backgroundColor = isSuccess ? 'black' : 'red';
 purchaseMessage.style.display = 'block';
 setTimeout(() => {
 purchaseMessage.style.display = 'none';
-}, 2000); // Message disappears after 2 seconds
+}, 2000); 
 }
 
 function gameLoop() {
-if (gameOver) return;
+if (gameOver) return; 
+
+// Debug options
+if (debugMode) { 
+if (infiniteHP) {
+player.hp = Infinity; 
+powerUps = powerUps.filter(powerUp => powerUp.type !== 'hpBoost'); 
+}
+if (infiniteCoins) { 
+coins = Infinity;
+updateCoinDisplay();
+updateShopCoinDisplay();
+}
+}
 
 ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-cameraOffsetY += (cameraTargetY - cameraOffsetY) * 0.05;
+cameraOffsetY += (cameraTargetY - cameraOffsetY) * 0.05; 
 
-let elapsedTime = Date.now() - startTime;
+let elapsedTime = Date.now() - startTime; 
 if (elapsedTime >= groundSafeTime) {
-if (!timeStopActive) {
+if (!timeStopActive) { 
 groundIsDeadly = true;
 groundSpeed = 0.5;
 }
 }
+
+if (score >= 50000) {
+groundSpeed = 2;
+} else if (score >= 25000) { 
+groundSpeed = 1.5;
+} else if (score >= 10000) { 
+groundSpeed = 1;
+} 
 
 if (groundSpeed > 0 && !timeStopActive) {
 groundY -= groundSpeed;
@@ -1752,24 +2367,24 @@ player.updatePowerUps();
 ctx.fillStyle = groundIsDeadly ? '#8B0000' : '#654321';
 ctx.fillRect(0, groundY - cameraOffsetY, GAME_WIDTH, GAME_HEIGHT - groundY + cameraOffsetY);
 
-for (let platform of platforms) {
+for (let platform of platforms) { 
 platform.update();
 platform.draw();
 }
 
 platforms = platforms.filter(platform => !platform.shouldRemove());
 
-while (lastPlatformY > player.y - 2 * GAME_HEIGHT) {
-addPlatformsRow();
+while (lastPlatformY > player.y - 2 * GAME_HEIGHT) { 
+addPlatformsRow(); 
 generateObstaclesRow(lastPlatformY - 60);
-}
+} 
 
-for (let obstacle of obstacles) {
+for (let obstacle of obstacles) { 
 obstacle.update();
 obstacle.draw();
 }
 
-obstacles = obstacles.filter(obstacle => !obstacle.shouldRemove());
+obstacles = obstacles.filter(obstacle => !obstacle.shouldRemove()); 
 
 for (let obstacle of flightObstacles) {
 obstacle.update();
@@ -1782,9 +2397,25 @@ powerUp.draw();
 
 for (let coinCollectible of coinCollectibles) {
 coinCollectible.draw();
-}
+} 
 
-player.draw();
+// Draw explosion particles AFTER other game objects to ensure visibility 
+for (let i = 0; i < explosionParticles.length; i++) { 
+let particle = explosionParticles[i]; 
+particle.x += particle.vx; 
+particle.y += particle.vy; 
+particle.size -= 0.4; 
+
+ctx.fillStyle = particle.color;
+ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+
+if (particle.size <= 0) { 
+explosionParticles.splice(i, 1); 
+i--;
+} 
+} 
+
+player.draw(); 
 
 if (timeStopActive) {
 applyTimeStopEffect();
@@ -1792,20 +2423,19 @@ applyTimeStopEffect();
 
 updatePowerUpDisplay();
 
-requestAnimationFrame(gameLoop);
+requestAnimationFrame(gameLoop); 
 }
 
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function() { 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-GAME_WIDTH = canvas.width;
+GAME_WIDTH = canvas.width; 
 GAME_HEIGHT = canvas.height;
-groundY = GAME_HEIGHT - 20;
-});
+groundY = GAME_HEIGHT - 20; 
+}); 
 
-startMenu.style.display = 'flex';
-updateCoinDisplay();
-</script>
-
-</body>
+startMenu.style.display = 'flex'; 
+updateCoinDisplay(); 
+</script> 
+</body> 
 </html>
